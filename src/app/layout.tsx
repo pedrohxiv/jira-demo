@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
+import { QueryProvider } from "@/components/query-provider";
 import { cn } from "@/lib/utils";
 import "@/styles/global.css";
 
@@ -19,7 +20,7 @@ const RootLayout = ({ children }: Props) => {
   return (
     <html>
       <body className={cn(font.className, "antialiased min-h-screen")}>
-        {children}
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );
