@@ -8,11 +8,11 @@ type ResponseType = InferResponseType<
 >;
 type RequestType = InferRequestType<
   (typeof client.api.auth)["sign-up"]["$post"]
->["json"];
+>;
 
 export const signUp = () => {
   const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async (json) => {
+    mutationFn: async ({ json }) => {
       const response = await client.api.auth["sign-up"]["$post"]({ json });
 
       return await response.json();
