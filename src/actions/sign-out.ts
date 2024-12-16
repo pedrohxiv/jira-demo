@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InferResponseType } from "hono";
+import { useRouter } from "next/navigation";
 
 import { client } from "@/lib/rpc";
 
@@ -8,6 +9,7 @@ type ResponseType = InferResponseType<
 >;
 
 export const signOut = () => {
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const mutation = useMutation<ResponseType, Error>({
@@ -17,6 +19,8 @@ export const signOut = () => {
       return await response.json();
     },
     onSuccess: () => {
+      router.refresh();
+
       queryClient.invalidateQueries({ queryKey: ["current"] });
     },
   });
