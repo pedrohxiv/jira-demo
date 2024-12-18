@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { auth } from "@/actions/auth";
+import { CreateWorkspaceForm } from "@/components/create-workspace-form";
 
 const DashboardPage = async () => {
   const user = await auth();
@@ -9,7 +10,7 @@ const DashboardPage = async () => {
     return redirect("/sign-in");
   }
 
-  return null;
+  return <CreateWorkspaceForm />;
 };
 
 export default DashboardPage;
