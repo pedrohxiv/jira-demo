@@ -2,8 +2,6 @@
 
 import { LogOut } from "lucide-react";
 
-import { currentUser } from "@/actions/current-user";
-import { signOut } from "@/actions/sign-out";
 import { DottedSeparator } from "@/components/dotted-separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -13,6 +11,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { signOut } from "@/mutations/sign-out";
+import { currentUser } from "@/queries/current-user";
 
 export const UserButton = () => {
   const { data, isLoading } = currentUser();

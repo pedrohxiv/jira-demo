@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 import { RiAddCircleFill } from "react-icons/ri";
 
-import { getWorkspaces } from "@/actions/get-workspaces";
 import { DottedSeparator } from "@/components/dotted-separator";
 import {
   Select,
@@ -14,11 +14,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { WorkspaceAvatar } from "@/components/workspace-avatar";
+import { useCreateWorkspace } from "@/hooks/use-create-workspace";
 import { routes } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { getWorkspaces } from "@/queries/get-workspaces";
 
 export const Sidebar = () => {
   const { data } = getWorkspaces();
+  const { open } = useCreateWorkspace();
+
+  const params = useParams<{ workspaceId: string }>();
+  const router = useRouter();
+
+  const onSelect = (id: string) => {
+    router.push(`/workspaces/${id}`);
+  };
 
   return (
     <aside className="h-full bg-neutral-100 p-4 w-full">
@@ -36,9 +46,12 @@ export const Sidebar = () => {
       <div className="flex flex-col gap-y-2">
         <div className="flex items-center justify-between">
           <p className="text-xs uppercase text-neutral-500">Workspaces</p>
-          <RiAddCircleFill className="size-5 text-neutral-500 cursor-pointer hover:opacity-75 transition" />
+          <RiAddCircleFill
+            className="size-5 text-neutral-500 cursor-pointer hover:opacity-75 transition"
+            onClick={open}
+          />
         </div>
-        <Select>
+        <Select value={params.workspaceId} onValueChange={onSelect}>
           <SelectTrigger className="w-full bg-neutral-200 font-medium p-1">
             <SelectValue placeholder="No workspace selected" />
           </SelectTrigger>

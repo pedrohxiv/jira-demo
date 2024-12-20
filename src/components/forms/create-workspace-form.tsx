@@ -3,11 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ImageIcon, X } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { createWorkspace } from "@/actions/create-workspace";
 import { DottedSeparator } from "@/components/dotted-separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -21,16 +21,18 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { createWorkspace } from "@/mutations/create-workspace";
 import { createWorkspaceSchema } from "@/schemas/workspaces";
 
 interface Props {
-  onCancel?: () => void;
+  onCancel: () => void;
 }
 
 export const CreateWorkspaceForm = ({ onCancel }: Props) => {
   const { mutate, isPending } = createWorkspace();
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof createWorkspaceSchema>>({
     resolver: zodResolver(createWorkspaceSchema),
@@ -54,8 +56,10 @@ export const CreateWorkspaceForm = ({ onCancel }: Props) => {
         image: values.image instanceof File ? values.image : "",
       },
       {
-        onSuccess: () => {
+        onSuccess: ({ data }) => {
           form.reset();
+
+          router.push(`/workspaces/${data.$id}`);
         },
       }
     );

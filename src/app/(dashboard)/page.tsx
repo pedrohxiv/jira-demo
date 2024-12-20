@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { auth } from "@/actions/auth";
-import { CreateWorkspaceForm } from "@/components/create-workspace-form";
+import { getWorkspaces } from "@/actions/workspaces";
 
 const DashboardPage = async () => {
   const user = await auth();
@@ -10,7 +10,13 @@ const DashboardPage = async () => {
     return redirect("/sign-in");
   }
 
-  return <CreateWorkspaceForm />;
+  const workspaces = await getWorkspaces();
+
+  if (workspaces.total === 0) {
+    return redirect("/workspaces/create");
+  }
+
+  return redirect(`/workspaces/${workspaces.documents[0].$id}`);
 };
 
 export default DashboardPage;

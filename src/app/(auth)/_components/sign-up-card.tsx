@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { signUp } from "@/actions/sign-up";
 import { DottedSeparator } from "@/components/dotted-separator";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
@@ -24,6 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { signUp } from "@/mutations/sign-up";
 import { signUpSchema } from "@/schemas/auth";
 
 export const SignUpCard = () => {
