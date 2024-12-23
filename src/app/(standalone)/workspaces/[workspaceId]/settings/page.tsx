@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/actions/auth";
 import { getWorkspace } from "@/actions/workspaces";
-import { UpdateWorkspaceForm } from "@/components/forms/update-workspace-form";
+import { EditWorkspaceForm } from "@/components/forms/edit-workspace-form";
 
 interface Props {
   params: { workspaceId: string };
@@ -23,7 +23,7 @@ const SettingPage = async ({ params }: Props) => {
 
   return (
     <div className="w-full lg:max-w-xl">
-      <UpdateWorkspaceForm initialValues={workspace} />
+      <EditWorkspaceForm initialValues={workspace} />
     </div>
   );
 };
