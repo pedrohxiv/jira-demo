@@ -11,7 +11,10 @@ import {
 import { sessionMiddleware } from "@/lib/session-middleware";
 import { MemberRole } from "@/lib/types";
 import { generateInviteCode } from "@/lib/utils";
-import { createWorkspaceSchema } from "@/schemas/workspaces";
+import {
+  createWorkspaceSchema,
+  updateWorkspaceSchema,
+} from "@/schemas/workspaces";
 
 const app = new Hono()
   .get("/", sessionMiddleware, async (c) => {
@@ -78,6 +81,62 @@ const app = new Hono()
         workspaceId: workspace.$id,
         role: MemberRole.ADMIN,
       });
+
+      return c.json({ data: workspace });
+    }
+  )
+  .patch(
+    "/:workspaceId",
+    sessionMiddleware,
+    zValidator("form", updateWorkspaceSchema),
+    async (c) => {
+      const databases = c.get("databases");
+      const storage = c.get("storage");
+      const user = c.get("user");
+
+      const { workspaceId } = c.req.param();
+      const { name, image } = c.req.valid("form");
+
+      const member = (
+        await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+          Query.equal("workspaceId", workspaceId),
+          Query.equal("userId", user.$id),
+        ])
+      ).documents[0];
+
+      if (!member || member.role !== MemberRole.ADMIN) {
+        return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      let imageUrl: string | undefined;
+
+      if (image instanceof File) {
+        const file = await storage.createFile(
+          IMAGES_BUCKET_ID,
+          ID.unique(),
+          image
+        );
+
+        const arrayBuffer = await storage.getFilePreview(
+          IMAGES_BUCKET_ID,
+          file.$id
+        );
+
+        imageUrl = `data:image/png;base64,${Buffer.from(arrayBuffer).toString(
+          "base64"
+        )}`;
+      } else if (imageUrl === undefined) {
+        imageUrl = "";
+      } else {
+        imageUrl = image;
+      }
+
+      const workspace = await databases.updateDocument(
+        DATABASE_ID,
+        WORKSPACES_ID,
+        workspaceId,
+        { name, imageUrl }
+      );
 
       return c.json({ data: workspace });
     }

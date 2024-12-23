@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { RiAddCircleFill } from "react-icons/ri";
 
 import { DottedSeparator } from "@/components/dotted-separator";
@@ -24,6 +24,7 @@ export const Sidebar = () => {
   const { open } = useCreateWorkspace();
 
   const params = useParams<{ workspaceId: string }>();
+  const pathname = usePathname();
   const router = useRouter();
 
   const onSelect = (id: string) => {
@@ -77,17 +78,17 @@ export const Sidebar = () => {
       <DottedSeparator className="my-4" />
       <div className="flex flex-col">
         {routes.map((route) => {
-          const isActive = false;
-          const Icon = isActive ? route.activeIcon : route.icon;
+          const href = `/workspaces/${params.workspaceId}${route.href}`;
+          const Icon = pathname === href ? route.activeIcon : route.icon;
 
           return (
-            <Link key={route.href} href={route.href}>
+            <Link key={route.href} href={href}>
               <div
                 className={cn(
                   "flex items-center gap-2.5 p-2.5 rounded-md font-medium hover:text-primary transition text-neutral-500",
                   {
                     "bg-white shadow-sm hover:opacity-100 text-primary":
-                      isActive,
+                      pathname === href,
                   }
                 )}
               >

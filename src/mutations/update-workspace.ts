@@ -1,26 +1,28 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
-import { useRouter } from "next/navigation";
 
 import { useToast } from "@/hooks/use-toast";
 import { client } from "@/lib/rpc";
 
 type ResponseType = InferResponseType<
-  (typeof client.api.auth)["sign-up"]["$post"]
+  (typeof client.api.workspaces)[":workspaceId"]["$patch"],
+  200
 >;
 type RequestType = InferRequestType<
-  (typeof client.api.auth)["sign-up"]["$post"]
+  (typeof client.api.workspaces)[":workspaceId"]["$patch"]
 >;
 
-export const signUp = () => {
-  const router = useRouter();
+export const updateWorkspace = () => {
   const queryClient = useQueryClient();
 
   const { toast } = useToast();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ form }) => {
-      const response = await client.api.auth["sign-up"]["$post"]({ form });
+    mutationFn: async ({ param, form }) => {
+      const response = await client.api.workspaces[":workspaceId"]["$patch"]({
+        param,
+        form,
+      });
 
       if (!response.ok) {
         throw new Error();
@@ -28,10 +30,9 @@ export const signUp = () => {
 
       return await response.json();
     },
-    onSuccess: () => {
-      router.refresh();
-
-      queryClient.invalidateQueries({ queryKey: ["current"] });
+    onSuccess: ({ data }) => {
+      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace", data.$id] });
     },
     onError: () => {
       toast({

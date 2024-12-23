@@ -14,8 +14,8 @@ const app = new Hono()
 
     return c.json({ data: user });
   })
-  .post("/sign-in", zValidator("json", signInSchema), async (c) => {
-    const { email, password } = c.req.valid("json");
+  .post("/sign-in", zValidator("form", signInSchema), async (c) => {
+    const { email, password } = c.req.valid("form");
 
     const { account } = await createAdminClient();
 
@@ -31,8 +31,8 @@ const app = new Hono()
 
     return c.json({ success: true });
   })
-  .post("/sign-up", zValidator("json", signUpSchema), async (c) => {
-    const { name, email, password } = c.req.valid("json");
+  .post("/sign-up", zValidator("form", signUpSchema), async (c) => {
+    const { name, email, password } = c.req.valid("form");
 
     const { account } = await createAdminClient();
 
