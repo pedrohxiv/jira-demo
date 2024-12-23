@@ -21,11 +21,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { createWorkspace } from "@/mutations/create-workspace";
 import { createWorkspaceSchema } from "@/schemas/workspaces";
 
 interface Props {
-  onCancel: () => void;
+  onCancel?: () => void;
 }
 
 export const CreateWorkspaceForm = ({ onCancel }: Props) => {
@@ -166,6 +167,7 @@ export const CreateWorkspaceForm = ({ onCancel }: Props) => {
                 size="lg"
                 variant="secondary"
                 onClick={onCancel}
+                className={cn(!!!onCancel && "invisible")}
               >
                 Cancel
               </Button>

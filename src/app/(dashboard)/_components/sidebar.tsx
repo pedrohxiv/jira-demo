@@ -53,7 +53,7 @@ export const Sidebar = () => {
         </div>
         <Select value={params.workspaceId} onValueChange={onSelect}>
           <SelectTrigger className="w-full bg-neutral-200 font-medium p-1">
-            <SelectValue placeholder="No workspace selected" />
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
             {data?.documents.map((workspace) => (
