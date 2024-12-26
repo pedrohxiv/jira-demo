@@ -1,10 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, ImageIcon, X } from "lucide-react";
+import { ArrowLeft, CheckCheck, Copy, ImageIcon, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useRef } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { useConfirm } from "@/hooks/use-confirm";
 import { Workspace } from "@/lib/types";
 import { deleteWorkspace } from "@/mutations/delete-workspace";
+import { resetInviteCode } from "@/mutations/reset-invite-code";
 import { updateWorkspace } from "@/mutations/update-workspace";
 import { updateWorkspaceSchema } from "@/schemas/workspaces";
 
@@ -33,16 +34,24 @@ interface Props {
 }
 
 export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
-  const [DeleteDialog, confirmDelete] = useConfirm(
+  const [isCopied, setIsCopied] = useState<boolean>(false);
+  const [DeleteWorkspaceDialog, confirmDeleteWorkspace] = useConfirm(
     "Delete Workspace",
     "This action cannot be undone.",
     "destructive"
   );
+  const [ResetInviteCodeDialog, confirmResetInviteCode] = useConfirm(
+    "Reset Invite Link",
+    "This action will invalidate the current invite link.",
+    "destructive"
+  );
 
-  const { mutate: updateMutate, isPending: updateIsPending } =
+  const { mutate: updateWorkspaceMutate, isPending: updateWorkspaceIsPending } =
     updateWorkspace();
-  const { mutate: deleteMutate, isPending: deleteIsPending } =
+  const { mutate: deleteWorkspaceMutate, isPending: deleteWorkspaceIsPending } =
     deleteWorkspace();
+  const { mutate: resetInviteCodeMutate, isPending: resetInviteCodeIsPending } =
+    resetInviteCode();
 
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -52,6 +61,12 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
     defaultValues: { ...initialValues, image: initialValues.imageUrl ?? "" },
   });
 
+  const fullInviteLink = `${window.location.origin}/workspaces/${initialValues.$id}/join/${initialValues.inviteCode}`;
+  const isPending =
+    updateWorkspaceIsPending ||
+    deleteWorkspaceIsPending ||
+    resetInviteCodeIsPending;
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
@@ -60,8 +75,8 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
     }
   };
 
-  const onSubmit = (values: z.infer<typeof updateWorkspaceSchema>) => {
-    updateMutate(
+  const handleFormSubmit = (values: z.infer<typeof updateWorkspaceSchema>) => {
+    updateWorkspaceMutate(
       {
         param: {
           workspaceId: initialValues.$id,
@@ -81,14 +96,14 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
     );
   };
 
-  const handleDelete = async () => {
-    const confirmed = await confirmDelete();
+  const handleDeleteWorkspace = async () => {
+    const confirmed = await confirmDeleteWorkspace();
 
     if (!confirmed) {
       return;
     }
 
-    deleteMutate(
+    deleteWorkspaceMutate(
       { param: { workspaceId: initialValues.$id } },
       {
         onSuccess: () => {
@@ -98,15 +113,43 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
     );
   };
 
+  const handleCopyInviteLink = () => {
+    setIsCopied(true);
+
+    navigator.clipboard.writeText(fullInviteLink);
+
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 3000);
+  };
+
+  const handleResetInviteCode = async () => {
+    const confirmed = await confirmResetInviteCode();
+
+    if (!confirmed) {
+      return;
+    }
+
+    resetInviteCodeMutate(
+      { param: { workspaceId: initialValues.$id } },
+      {
+        onSuccess: () => {
+          router.refresh();
+        },
+      }
+    );
+  };
+
   return (
     <div className="flex flex-col gap-y-4">
-      <DeleteDialog />
+      <DeleteWorkspaceDialog />
+      <ResetInviteCodeDialog />
       <Card className="w-full h-full border-none shadow-none">
         <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
           <Button
             size="sm"
             variant="secondary"
-            disabled={updateIsPending || deleteIsPending}
+            disabled={isPending}
             onClick={!!onCancel ? onCancel : () => router.back()}
           >
             <ArrowLeft className="size-4" />
@@ -119,8 +162,8 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
         <DottedSeparator className="px-7" />
         <CardContent className="p-7">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <div className="flex flex-col gap-y-4">
+            <form onSubmit={form.handleSubmit(handleFormSubmit)}>
+              <div className="flex flex-col">
                 <FormField
                   name="name"
                   control={form.control}
@@ -130,7 +173,7 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
                       <FormControl>
                         <Input
                           {...field}
-                          disabled={updateIsPending || deleteIsPending}
+                          disabled={isPending}
                           type="text"
                           placeholder="Enter workspace name"
                         />
@@ -143,7 +186,7 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
                   name="image"
                   control={form.control}
                   render={({ field }) => (
-                    <div className="flex flex-col gap-y-2">
+                    <div className="flex flex-col mt-5">
                       <div className="flex items-center gap-x-5">
                         {field.value ? (
                           <div className="size-[72px] relative rounded-md overflow-hidden group">
@@ -157,7 +200,7 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
                               fill
                               className="object-cover"
                             />
-                            {!(updateIsPending || deleteIsPending) && (
+                            {!isPending && (
                               <div className="absolute top-0 right-0 m-0.5">
                                 <X
                                   className="size-5 cursor-pointer opacity-0 transition-opacity duration-100 group-hover:opacity-100 bg-muted rounded-md"
@@ -190,13 +233,13 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
                             className="hidden"
                             type="file"
                             ref={inputRef}
-                            disabled={updateIsPending || deleteIsPending}
+                            disabled={isPending}
                             onChange={handleImageChange}
                             accept=".jpg, .png, .svg, .jpeg"
                           />
                           <Button
                             type="button"
-                            disabled={updateIsPending || deleteIsPending}
+                            disabled={isPending}
                             variant="teritary"
                             size="xs"
                             className="w-fit mt-2"
@@ -209,12 +252,11 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
                     </div>
                   )}
                 />
-              </div>
-              <DottedSeparator className="py-7" />
-              <div className="flex items-center justify-end">
+                <DottedSeparator className="py-7" />
                 <Button
+                  className="w-fit ml-auto"
                   type="submit"
-                  disabled={updateIsPending || deleteIsPending}
+                  disabled={isPending}
                   size="lg"
                 >
                   Save Changes
@@ -227,18 +269,61 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
       <Card className="w-full h-full border-none shadow-none">
         <CardContent className="p-7">
           <div className="flex flex-col">
+            <h3 className="font-bold">Invite Members</h3>
+            <p className="text-sm text-muted-foreground">
+              Use the invite link to add members to your workspace.
+            </p>
+            <div className="mt-4">
+              <div className="flex items-center gap-x-2">
+                <Input
+                  className="disabled:cursor-text disabled:opacity-100"
+                  disabled
+                  value={fullInviteLink}
+                />
+                <Button
+                  disabled={isPending}
+                  onClick={handleCopyInviteLink}
+                  variant="secondary"
+                  className="size-12"
+                >
+                  {isCopied ? (
+                    <CheckCheck className="size-5" />
+                  ) : (
+                    <Copy className="size-5" />
+                  )}
+                </Button>
+              </div>
+            </div>
+            <DottedSeparator className="py-7" />
+            <Button
+              className="w-fit ml-auto"
+              size="lg"
+              variant="destructive"
+              type="button"
+              disabled={isPending}
+              onClick={handleResetInviteCode}
+            >
+              Reset Invite Link
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+      <Card className="w-full h-full border-none shadow-none">
+        <CardContent className="p-7">
+          <div className="flex flex-col">
             <h3 className="font-bold">Danger Zone</h3>
             <p className="text-sm text-muted-foreground">
               Deleting a workspace is irreversible and will remove all
               associated data.
             </p>
+            <DottedSeparator className="py-7" />
             <Button
-              className="mt-6 w-fit ml-auto"
+              className="w-fit ml-auto"
               size="lg"
               variant="destructive"
               type="button"
-              disabled={updateIsPending || deleteIsPending}
-              onClick={handleDelete}
+              disabled={isPending}
+              onClick={handleDeleteWorkspace}
             >
               Delete Workspace
             </Button>
