@@ -78,9 +78,7 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
   const handleFormSubmit = (values: z.infer<typeof updateWorkspaceSchema>) => {
     updateWorkspaceMutate(
       {
-        param: {
-          workspaceId: initialValues.$id,
-        },
+        param: { workspaceId: initialValues.$id },
         form: {
           ...values,
           image: values.image instanceof File ? values.image : "",

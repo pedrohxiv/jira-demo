@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ImageIcon, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -50,7 +50,7 @@ export const CreateWorkspaceForm = ({ onCancel }: Props) => {
     }
   };
 
-  const onSubmit = (values: z.infer<typeof createWorkspaceSchema>) => {
+  const handleFormSubmit = (values: z.infer<typeof createWorkspaceSchema>) => {
     mutate(
       {
         form: {
@@ -78,7 +78,7 @@ export const CreateWorkspaceForm = ({ onCancel }: Props) => {
       <DottedSeparator className="px-7" />
       <CardContent className="p-7">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit(handleFormSubmit)}>
             <div className="flex flex-col gap-y-4">
               <FormField
                 name="name"
