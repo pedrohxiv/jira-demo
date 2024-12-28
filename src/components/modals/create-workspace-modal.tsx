@@ -1,6 +1,6 @@
 "use client";
 
-import { CreateWorkspaceForm } from "@/components/forms/create-workspace-form";
+import { CreateWorkspaceForm } from "@/components/cards/create-workspace-form";
 import { ResponsiveModal } from "@/components/modals/responsive-modal";
 import { useCreateWorkspace } from "@/hooks/use-create-workspace";
 

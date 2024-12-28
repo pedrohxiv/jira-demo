@@ -6,12 +6,11 @@ import {
   Account,
   Client,
   Databases,
-  Models,
   Storage,
   type Account as AccountType,
   type Databases as DatabasesType,
+  type Models,
   type Storage as StorageType,
-  type Users as UsersType,
 } from "node-appwrite";
 
 import { AUTH_COOKIE } from "@/lib/constants";
@@ -21,7 +20,6 @@ type AdditionalContext = {
     account: AccountType;
     databases: DatabasesType;
     storage: StorageType;
-    users: UsersType;
     user: Models.User<Models.Preferences>;
   };
 };

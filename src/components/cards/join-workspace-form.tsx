@@ -26,7 +26,7 @@ export const JoinWorkspaceForm = ({ name, workspaceId, code }: Props) => {
 
   const handleClick = () => {
     mutate(
-      { param: { workspaceId }, form: { code } },
+      { param: { workspaceId }, json: { code } },
       {
         onSuccess: ({ data }) => {
           router.push(`/workspaces/${data.$id}`);

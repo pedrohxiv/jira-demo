@@ -79,7 +79,7 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
     updateWorkspaceMutate(
       {
         param: { workspaceId: initialValues.$id },
-        form: {
+        json: {
           ...values,
           image: values.image instanceof File ? values.image : "",
         },

@@ -1,21 +1,51 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { deleteCookie, setCookie } from "hono/cookie";
-import { ID } from "node-appwrite";
+import { ID, Query } from "node-appwrite";
 
 import { createAdminClient } from "@/lib/appwrite";
-import { AUTH_COOKIE } from "@/lib/constants";
+import { AUTH_COOKIE, DATABASE_ID, MEMBERS_ID } from "@/lib/constants";
 import { sessionMiddleware } from "@/lib/session-middleware";
-import { signInSchema, signUpSchema } from "@/schemas/auth";
+import {
+  getCurrentUserSchema,
+  signInSchema,
+  signUpSchema,
+} from "@/schemas/auth";
 
 const app = new Hono()
-  .get("/current-user", sessionMiddleware, (c) => {
-    const user = c.get("user");
+  .get(
+    "/current-user",
+    sessionMiddleware,
+    zValidator("query", getCurrentUserSchema),
+    async (c) => {
+      const user = c.get("user");
 
-    return c.json({ data: user });
-  })
-  .post("/sign-in", zValidator("form", signInSchema), async (c) => {
-    const { email, password } = c.req.valid("form");
+      const { workspaceId } = c.req.valid("query");
+
+      let role: string | undefined;
+
+      if (workspaceId) {
+        const databases = c.get("databases");
+
+        const member = (
+          await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+            Query.equal("workspaceId", workspaceId),
+            Query.equal("userId", user.$id),
+          ])
+        ).documents[0];
+
+        if (!member) {
+          return c.json({ error: "Unauthorized" }, 401);
+        }
+
+        role = member.role;
+      }
+
+      return c.json({ data: { ...user, role } });
+    }
+  )
+  .post("/sign-in", zValidator("json", signInSchema), async (c) => {
+    const { email, password } = c.req.valid("json");
 
     const { account } = await createAdminClient();
 
@@ -31,8 +61,8 @@ const app = new Hono()
 
     return c.json({ success: true });
   })
-  .post("/sign-up", zValidator("form", signUpSchema), async (c) => {
-    const { name, email, password } = c.req.valid("form");
+  .post("/sign-up", zValidator("json", signUpSchema), async (c) => {
+    const { name, email, password } = c.req.valid("json");
 
     const { account } = await createAdminClient();
 

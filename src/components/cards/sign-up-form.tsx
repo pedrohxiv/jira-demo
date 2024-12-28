@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input";
 import { signUp } from "@/mutations/sign-up";
 import { signUpSchema } from "@/schemas/auth";
 
-export const SignUpCard = () => {
+export const SignUpForm = () => {
   const { mutate, isPending } = signUp();
 
   const form = useForm<z.infer<typeof signUpSchema>>({
@@ -39,7 +39,7 @@ export const SignUpCard = () => {
   });
 
   const onSubmit = (values: z.infer<typeof signUpSchema>) => {
-    mutate({ form: values });
+    mutate({ json: values });
   };
 
   return (
@@ -80,6 +80,12 @@ export const SignUpCard = () => {
                       disabled={isPending}
                       type="text"
                       placeholder="Enter your name"
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value.charAt(0).toUpperCase() +
+                            e.target.value.slice(1)
+                        )
+                      }
                     />
                   </FormControl>
                   <FormMessage />

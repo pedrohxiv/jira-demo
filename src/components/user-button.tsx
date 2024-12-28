@@ -10,20 +10,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Skeleton } from "@/components/ui/skeleton";
 import { signOut } from "@/mutations/sign-out";
-import { currentUser } from "@/queries/current-user";
+import { getCurrentUser } from "@/queries/get-current-user";
 
 export const UserButton = () => {
-  const { data, isLoading } = currentUser();
+  const { data } = getCurrentUser();
   const { mutate } = signOut();
 
   if (!data) {
     return null;
-  }
-
-  if (isLoading) {
-    return <Skeleton className="size-10 rounded-full" />;
   }
 
   return (

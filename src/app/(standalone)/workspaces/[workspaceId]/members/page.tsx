@@ -2,13 +2,13 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/actions/auth";
 import { getWorkspace } from "@/actions/workspaces";
-import { EditWorkspaceForm } from "@/components/cards/edit-workspace-form";
+import { MembersList } from "@/components/cards/members-list";
 
 interface Props {
   params: { workspaceId: string };
 }
 
-const SettingPage = async ({ params }: Props) => {
+const MembersPage = async ({ params }: Props) => {
   const user = await auth();
 
   if (!user) {
@@ -23,9 +23,12 @@ const SettingPage = async ({ params }: Props) => {
 
   return (
     <div className="w-full lg:max-w-xl">
-      <EditWorkspaceForm initialValues={workspace} />
+      <MembersList
+        workspaceId={params.workspaceId}
+        workspaceUserId={workspace.userId}
+      />
     </div>
   );
 };
 
-export default SettingPage;
+export default MembersPage;

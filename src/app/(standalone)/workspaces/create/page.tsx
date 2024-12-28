@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { auth } from "@/actions/auth";
-import { CreateWorkspaceForm } from "@/components/forms/create-workspace-form";
+import { CreateWorkspaceForm } from "@/components/cards/create-workspace-form";
 
 const CreatePage = async () => {
   const user = await auth();

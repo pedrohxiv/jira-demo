@@ -43,13 +43,13 @@ const app = new Hono()
   .post(
     "/",
     sessionMiddleware,
-    zValidator("form", createWorkspaceSchema),
+    zValidator("json", createWorkspaceSchema),
     async (c) => {
       const databases = c.get("databases");
       const storage = c.get("storage");
       const user = c.get("user");
 
-      const { name, image } = c.req.valid("form");
+      const { name, image } = c.req.valid("json");
 
       let imageUrl: string | undefined;
 
@@ -89,14 +89,14 @@ const app = new Hono()
   .patch(
     "/:workspaceId",
     sessionMiddleware,
-    zValidator("form", updateWorkspaceSchema),
+    zValidator("json", updateWorkspaceSchema),
     async (c) => {
       const databases = c.get("databases");
       const storage = c.get("storage");
       const user = c.get("user");
 
       const { workspaceId } = c.req.param();
-      const { name, image } = c.req.valid("form");
+      const { name, image } = c.req.valid("json");
 
       const member = (
         await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
@@ -194,13 +194,13 @@ const app = new Hono()
   .post(
     "/:workspaceId/join",
     sessionMiddleware,
-    zValidator("form", joinWorkspaceSchema),
+    zValidator("json", joinWorkspaceSchema),
     async (c) => {
       const databases = c.get("databases");
       const user = c.get("user");
 
       const { workspaceId } = c.req.param();
-      const { code } = c.req.valid("form");
+      const { code } = c.req.valid("json");
 
       const member = (
         await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [

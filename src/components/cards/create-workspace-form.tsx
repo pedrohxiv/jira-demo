@@ -53,7 +53,7 @@ export const CreateWorkspaceForm = ({ onCancel }: Props) => {
   const handleFormSubmit = (values: z.infer<typeof createWorkspaceSchema>) => {
     mutate(
       {
-        form: {
+        json: {
           ...values,
           image: values.image instanceof File ? values.image : "",
         },

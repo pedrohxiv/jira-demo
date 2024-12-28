@@ -13,8 +13,8 @@ export const createWorkspace = () => {
   const { toast } = useToast();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ form }) => {
-      const response = await client.api.workspaces["$post"]({ form });
+    mutationFn: async ({ json }) => {
+      const response = await client.api.workspaces["$post"]({ json });
 
       if (!response.ok) {
         throw new Error();

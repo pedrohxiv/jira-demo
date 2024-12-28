@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/actions/auth";
 import { getWorkspaceName } from "@/actions/workspaces";
-import { JoinWorkspaceForm } from "@/components/forms/join-workspace-form";
+import { JoinWorkspaceForm } from "@/components/cards/join-workspace-form";
 
 interface Props {
   params: { workspaceId: string; inviteCode: string };

@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { signIn } from "@/mutations/sign-in";
 import { signInSchema } from "@/schemas/auth";
 
-export const SignInCard = () => {
+export const SignInForm = () => {
   const { mutate, isPending } = signIn();
 
   const form = useForm<z.infer<typeof signInSchema>>({
@@ -32,7 +32,7 @@ export const SignInCard = () => {
   });
 
   const onSubmit = (values: z.infer<typeof signInSchema>) => {
-    mutate({ form: values });
+    mutate({ json: values });
   };
 
   return (

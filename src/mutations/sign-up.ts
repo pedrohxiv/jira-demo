@@ -19,8 +19,8 @@ export const signUp = () => {
   const { toast } = useToast();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ form }) => {
-      const response = await client.api.auth["sign-up"]["$post"]({ form });
+    mutationFn: async ({ json }) => {
+      const response = await client.api.auth["sign-up"]["$post"]({ json });
 
       if (!response.ok) {
         throw new Error();
@@ -31,7 +31,7 @@ export const signUp = () => {
     onSuccess: () => {
       router.refresh();
 
-      queryClient.invalidateQueries({ queryKey: ["current"] });
+      queryClient.invalidateQueries({ queryKey: ["current-user"] });
     },
     onError: () => {
       toast({

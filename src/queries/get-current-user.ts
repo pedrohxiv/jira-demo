@@ -2,11 +2,17 @@ import { useQuery } from "@tanstack/react-query";
 
 import { client } from "@/lib/rpc";
 
-export const currentUser = () => {
+interface Props {
+  workspaceId?: string;
+}
+
+export const getCurrentUser = ({ workspaceId }: Props = {}) => {
   const query = useQuery({
-    queryKey: ["current"],
+    queryKey: ["current-user", workspaceId],
     queryFn: async () => {
-      const response = await client.api.auth["current-user"]["$get"]();
+      const response = await client.api.auth["current-user"]["$get"]({
+        query: { workspaceId },
+      });
 
       if (!response.ok) {
         return null;

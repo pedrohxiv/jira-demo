@@ -28,7 +28,7 @@ export const signOut = () => {
     onSuccess: () => {
       router.refresh();
 
-      queryClient.invalidateQueries({ queryKey: ["current"] });
+      queryClient.invalidateQueries({ queryKey: ["current-user"] });
       queryClient.invalidateQueries({ queryKey: ["workspaces"] });
     },
     onError: () => {
