@@ -6,7 +6,8 @@ import { useToast } from "@/hooks/use-toast";
 import { client } from "@/lib/rpc";
 
 type ResponseType = InferResponseType<
-  (typeof client.api.auth)["sign-out"]["$post"]
+  (typeof client.api.auth)["sign-out"]["$post"],
+  200
 >;
 
 export const signOut = () => {

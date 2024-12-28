@@ -18,10 +18,10 @@ export const updateWorkspace = () => {
   const { toast } = useToast();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ param, json }) => {
+    mutationFn: async ({ param, form }) => {
       const response = await client.api.workspaces[":workspaceId"]["$patch"]({
         param,
-        json,
+        form,
       });
 
       if (!response.ok) {

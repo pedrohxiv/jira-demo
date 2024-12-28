@@ -1,27 +1,23 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
-import { useRouter } from "next/navigation";
 
 import { useToast } from "@/hooks/use-toast";
 import { client } from "@/lib/rpc";
 
 type ResponseType = InferResponseType<
-  (typeof client.api.auth)["sign-up"]["$post"],
+  (typeof client.api.projects)["$post"],
   200
 >;
-type RequestType = InferRequestType<
-  (typeof client.api.auth)["sign-up"]["$post"]
->;
+type RequestType = InferRequestType<(typeof client.api.projects)["$post"]>;
 
-export const signUp = () => {
-  const router = useRouter();
+export const createProject = () => {
   const queryClient = useQueryClient();
 
   const { toast } = useToast();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json }) => {
-      const response = await client.api.auth["sign-up"]["$post"]({ json });
+    mutationFn: async ({ form }) => {
+      const response = await client.api.projects["$post"]({ form });
 
       if (!response.ok) {
         throw new Error();
@@ -30,9 +26,7 @@ export const signUp = () => {
       return await response.json();
     },
     onSuccess: () => {
-      router.refresh();
-
-      queryClient.invalidateQueries({ queryKey: ["current-user"] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
     onError: () => {
       toast({

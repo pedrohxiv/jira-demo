@@ -43,13 +43,13 @@ const app = new Hono()
   .post(
     "/",
     sessionMiddleware,
-    zValidator("json", createWorkspaceSchema),
+    zValidator("form", createWorkspaceSchema),
     async (c) => {
       const databases = c.get("databases");
       const storage = c.get("storage");
       const user = c.get("user");
 
-      const { name, image } = c.req.valid("json");
+      const { name, image } = c.req.valid("form");
 
       let imageUrl: string | undefined;
 
@@ -89,14 +89,14 @@ const app = new Hono()
   .patch(
     "/:workspaceId",
     sessionMiddleware,
-    zValidator("json", updateWorkspaceSchema),
+    zValidator("form", updateWorkspaceSchema),
     async (c) => {
       const databases = c.get("databases");
       const storage = c.get("storage");
       const user = c.get("user");
 
       const { workspaceId } = c.req.param();
-      const { name, image } = c.req.valid("json");
+      const { name, image } = c.req.valid("form");
 
       const member = (
         await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [

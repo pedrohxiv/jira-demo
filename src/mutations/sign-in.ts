@@ -6,7 +6,8 @@ import { useToast } from "@/hooks/use-toast";
 import { client } from "@/lib/rpc";
 
 type ResponseType = InferResponseType<
-  (typeof client.api.auth)["sign-in"]["$post"]
+  (typeof client.api.auth)["sign-in"]["$post"],
+  200
 >;
 type RequestType = InferRequestType<
   (typeof client.api.auth)["sign-in"]["$post"]

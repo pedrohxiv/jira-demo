@@ -46,15 +46,15 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
     "destructive"
   );
 
+  const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
+
   const { mutate: updateWorkspaceMutate, isPending: updateWorkspaceIsPending } =
     updateWorkspace();
   const { mutate: deleteWorkspaceMutate, isPending: deleteWorkspaceIsPending } =
     deleteWorkspace();
   const { mutate: resetInviteCodeMutate, isPending: resetInviteCodeIsPending } =
     resetInviteCode();
-
-  const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof updateWorkspaceSchema>>({
     resolver: zodResolver(updateWorkspaceSchema),
@@ -79,7 +79,7 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
     updateWorkspaceMutate(
       {
         param: { workspaceId: initialValues.$id },
-        json: {
+        form: {
           ...values,
           image: values.image instanceof File ? values.image : "",
         },

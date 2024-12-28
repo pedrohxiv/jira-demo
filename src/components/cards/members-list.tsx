@@ -4,8 +4,8 @@ import { ArrowLeft, Crown, MoreVertical, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Fragment } from "react";
 
+import { MemberAvatar } from "@/components/avatars/member-avatar";
 import { DottedSeparator } from "@/components/dotted-separator";
-import { MemberAvatar } from "@/components/member-avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -34,14 +34,14 @@ export const MembersList = ({ workspaceId, workspaceUserId }: Props) => {
     "destructive"
   );
 
+  const router = useRouter();
+
   const { data: members } = getMembers({ workspaceId });
   const { data: currentUser } = getCurrentUser({ workspaceId });
   const { mutate: updateMemberMutate, isPending: updateMemberIsPending } =
     updateMember();
   const { mutate: deleteMemberMutate, isPending: deleteMemberIsPending } =
     deleteMember();
-
-  const router = useRouter();
 
   const isPending = updateMemberIsPending || deleteMemberIsPending;
 

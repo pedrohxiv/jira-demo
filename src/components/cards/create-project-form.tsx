@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ImageIcon, X } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -22,21 +22,23 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { createWorkspace } from "@/mutations/create-workspace";
-import { createWorkspaceSchema } from "@/schemas/workspaces";
+import { createProject } from "@/mutations/create-project";
+import { createProjectSchema } from "@/schemas/projects";
 
 interface Props {
   onCancel?: () => void;
 }
 
-export const CreateWorkspaceForm = ({ onCancel }: Props) => {
+export const CreateProjectForm = ({ onCancel }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const params = useParams<{ workspaceId: string }>();
   const router = useRouter();
 
-  const { mutate, isPending } = createWorkspace();
+  const { mutate, isPending } = createProject();
 
-  const form = useForm<z.infer<typeof createWorkspaceSchema>>({
-    resolver: zodResolver(createWorkspaceSchema),
+  const form = useForm<z.infer<typeof createProjectSchema>>({
+    resolver: zodResolver(createProjectSchema.omit({ workspaceId: true })),
     defaultValues: {
       name: "",
     },
@@ -50,19 +52,20 @@ export const CreateWorkspaceForm = ({ onCancel }: Props) => {
     }
   };
 
-  const handleFormSubmit = (values: z.infer<typeof createWorkspaceSchema>) => {
+  const handleFormSubmit = (values: z.infer<typeof createProjectSchema>) => {
     mutate(
       {
         form: {
           ...values,
           image: values.image instanceof File ? values.image : "",
+          workspaceId: params.workspaceId,
         },
       },
       {
         onSuccess: ({ data }) => {
           form.reset();
 
-          router.push(`/workspaces/${data.$id}`);
+          router.push(`/workspaces/${params.workspaceId}/projects/${data.$id}`);
         },
       }
     );
@@ -72,7 +75,7 @@ export const CreateWorkspaceForm = ({ onCancel }: Props) => {
     <Card className="w-full h-full border-none shadow-none">
       <CardHeader className="flex p-7">
         <CardTitle className="text-xl font-bold">
-          Create a new Workspace
+          Create a new Project
         </CardTitle>
       </CardHeader>
       <DottedSeparator className="px-7" />
@@ -85,13 +88,13 @@ export const CreateWorkspaceForm = ({ onCancel }: Props) => {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Workspace Name</FormLabel>
+                    <FormLabel>Project Name</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         disabled={isPending}
                         type="text"
-                        placeholder="Enter workspace name"
+                        placeholder="Enter project name"
                       />
                     </FormControl>
                     <FormMessage />
@@ -141,7 +144,7 @@ export const CreateWorkspaceForm = ({ onCancel }: Props) => {
                         </Avatar>
                       )}
                       <div className="flex flex-col">
-                        <p className="text-sm font-medium">Workspace Icon</p>
+                        <p className="text-sm font-medium">Project Icon</p>
                         <p className="text-sm text-muted-foreground">
                           JPG, PNG, SVG or JPEG, max 1 MB
                         </p>
@@ -182,7 +185,7 @@ export const CreateWorkspaceForm = ({ onCancel }: Props) => {
                 Cancel
               </Button>
               <Button type="submit" disabled={isPending} size="lg">
-                Create Workspace
+                Create Project
               </Button>
             </div>
           </form>

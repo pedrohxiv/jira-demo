@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { RiAddCircleFill } from "react-icons/ri";
 
+import { ProjectAvatar } from "@/components/avatars/project-avatar";
+import { WorkspaceAvatar } from "@/components/avatars/workspace-avatar";
 import { DottedSeparator } from "@/components/dotted-separator";
 import {
   Select,
@@ -13,19 +15,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { WorkspaceAvatar } from "@/components/workspace-avatar";
+import { useCreateProject } from "@/hooks/use-create-project";
 import { useCreateWorkspace } from "@/hooks/use-create-workspace";
 import { routes } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { getProjects } from "@/queries/get-projects";
 import { getWorkspaces } from "@/queries/get-workspaces";
 
 export const Sidebar = () => {
-  const { data } = getWorkspaces();
-  const { open } = useCreateWorkspace();
-
-  const params = useParams<{ workspaceId: string }>();
+  const params = useParams<{ workspaceId: string; projectId: string }>();
   const pathname = usePathname();
   const router = useRouter();
+
+  const { data: workspaces } = getWorkspaces();
+  const { data: projects } = getProjects({ workspaceId: params.workspaceId });
+
+  const { open: openCreateWorkspace } = useCreateWorkspace();
+  const { open: openCreateProject } = useCreateProject();
 
   const onSelect = (id: string) => {
     router.push(`/workspaces/${id}`);
@@ -49,7 +55,7 @@ export const Sidebar = () => {
           <p className="text-xs uppercase text-neutral-500">Workspaces</p>
           <RiAddCircleFill
             className="size-5 text-neutral-500 cursor-pointer hover:opacity-75 transition"
-            onClick={open}
+            onClick={openCreateWorkspace}
           />
         </div>
         <Select value={params.workspaceId} onValueChange={onSelect}>
@@ -57,7 +63,7 @@ export const Sidebar = () => {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {data?.documents.map((workspace) => (
+            {workspaces?.documents.map((workspace) => (
               <SelectItem
                 key={workspace.$id}
                 value={workspace.$id}
@@ -94,6 +100,36 @@ export const Sidebar = () => {
               >
                 <Icon className="size-5 text-neutral-500" />
                 {route.label}
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+      <DottedSeparator className="my-4" />
+      <div className="flex flex-col gap-y-2">
+        <div className="flex items-center justify-between">
+          <p className="text-xs uppercase text-neutral-500">Projects</p>
+          <RiAddCircleFill
+            className="size-5 text-neutral-500 cursor-pointer hover:opacity-75 transition"
+            onClick={openCreateProject}
+          />
+        </div>
+        {projects?.documents.map((project) => {
+          const href = `/workspaces/${params.workspaceId}/projects/${params.projectId}`;
+
+          return (
+            <Link href={href} key={project.$id}>
+              <div
+                className={cn(
+                  "flex items-center gap-2.5 p-2.5 rounded-md hover:opacity-75 transition cursor-pointer text-neutral-500",
+                  {
+                    "bg-white shadow-sm hover:opacity-100 text-primary":
+                      pathname === href,
+                  }
+                )}
+              >
+                <ProjectAvatar name={project.name} image={project.imageUrl} />
+                <span className="truncate">{project.name}</span>
               </div>
             </Link>
           );

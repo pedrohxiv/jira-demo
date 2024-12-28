@@ -1,6 +1,6 @@
 import { useMedia } from "react-use";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 
 interface Props {
@@ -15,7 +15,11 @@ export const ResponsiveModal = ({ children, open, onOpenChange }: Props) => {
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="w-full sm:max-w-lg p-0 border-none overflow-y-auto hide-scrollbar max-h-[85vh]">
+        <DialogContent
+          aria-describedby={undefined}
+          className="w-full sm:max-w-lg p-0 border-none overflow-y-auto hide-scrollbar max-h-[85vh]"
+        >
+          <DialogTitle className="hidden" />
           {children}
         </DialogContent>
       </Dialog>

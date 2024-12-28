@@ -20,9 +20,9 @@ interface Props {
 }
 
 export const JoinWorkspaceForm = ({ name, workspaceId, code }: Props) => {
-  const { mutate, isPending } = joinWorkspace();
-
   const router = useRouter();
+
+  const { mutate, isPending } = joinWorkspace();
 
   const handleClick = () => {
     mutate(
