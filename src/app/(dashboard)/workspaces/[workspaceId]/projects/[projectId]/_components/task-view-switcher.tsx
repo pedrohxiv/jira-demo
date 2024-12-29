@@ -10,7 +10,9 @@ import { useTaskFilters } from "@/hooks/use-task-filters";
 import { useTaskView } from "@/hooks/use-task-view";
 import { getTasks } from "@/queries/get-tasks";
 
+import { columns } from "./columns";
 import { DataFilters } from "./data-filters";
+import { DataTable } from "./data-table";
 
 interface Props {
   workspaceId: string;
@@ -57,11 +59,17 @@ export const TaskViewSwitcher = ({ workspaceId }: Props) => {
         <DottedSeparator className="my-4" />
         <DataFilters workspaceId={workspaceId} />
         <DottedSeparator className="my-4" />
-        <>
-          <TabsContent value="table" className="mt-0"></TabsContent>
-          <TabsContent value="kanban" className="mt-0"></TabsContent>
-          <TabsContent value="calendar" className="mt-0"></TabsContent>
-        </>
+        {!data ? (
+          <></>
+        ) : (
+          <>
+            <TabsContent value="table" className="mt-0">
+              <DataTable columns={columns} data={data.documents} />
+            </TabsContent>
+            <TabsContent value="kanban" className="mt-0"></TabsContent>
+            <TabsContent value="calendar" className="mt-0"></TabsContent>
+          </>
+        )}
       </div>
     </Tabs>
   );
