@@ -46,14 +46,7 @@ export const MembersList = ({ workspaceId, workspaceUserId }: Props) => {
   const isPending = updateMemberIsPending || deleteMemberIsPending;
 
   const handleUpdateMember = (memberId: string, role: MemberRole) => {
-    updateMemberMutate(
-      { param: { memberId }, json: { role } },
-      {
-        onSuccess: () => {
-          router.refresh();
-        },
-      }
-    );
+    updateMemberMutate({ param: { memberId }, json: { role } });
   };
 
   const handleDeleteMember = async (memberId: string) => {
@@ -63,14 +56,7 @@ export const MembersList = ({ workspaceId, workspaceUserId }: Props) => {
       return;
     }
 
-    deleteMemberMutate(
-      { param: { memberId } },
-      {
-        onSuccess: () => {
-          router.refresh();
-        },
-      }
-    );
+    deleteMemberMutate({ param: { memberId } });
   };
 
   if (!members || !currentUser) {

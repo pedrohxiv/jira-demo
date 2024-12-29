@@ -11,3 +11,9 @@ export type Workspace = Models.Document & {
   imageUrl: string;
   inviteCode: string;
 };
+
+export type Project = Models.Document & {
+  name: string;
+  workspaceId: string;
+  imageUrl: string;
+};

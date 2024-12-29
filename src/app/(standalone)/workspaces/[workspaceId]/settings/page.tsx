@@ -8,7 +8,7 @@ interface Props {
   params: { workspaceId: string };
 }
 
-const SettingPage = async ({ params }: Props) => {
+const WorkspaceSettingPage = async ({ params }: Props) => {
   const user = await auth();
 
   if (!user) {
@@ -28,4 +28,4 @@ const SettingPage = async ({ params }: Props) => {
   );
 };
 
-export default SettingPage;
+export default WorkspaceSettingPage;

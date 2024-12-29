@@ -23,7 +23,7 @@ import { getProjects } from "@/queries/get-projects";
 import { getWorkspaces } from "@/queries/get-workspaces";
 
 export const Sidebar = () => {
-  const params = useParams<{ workspaceId: string; projectId: string }>();
+  const params = useParams<{ workspaceId: string }>();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -115,7 +115,7 @@ export const Sidebar = () => {
           />
         </div>
         {projects?.documents.map((project) => {
-          const href = `/workspaces/${params.workspaceId}/projects/${params.projectId}`;
+          const href = `/workspaces/${params.workspaceId}/projects/${project.$id}`;
 
           return (
             <Link href={href} key={project.$id}>
