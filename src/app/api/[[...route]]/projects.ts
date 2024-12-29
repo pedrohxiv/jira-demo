@@ -9,7 +9,7 @@ import {
   PROJECTS_ID,
 } from "@/lib/constants";
 import { sessionMiddleware } from "@/lib/session-middleware";
-import { Project } from "@/lib/types";
+import { Member, Project } from "@/lib/types";
 import {
   createProjectSchema,
   getProjectsSchema,
@@ -28,7 +28,7 @@ const app = new Hono()
       const { workspaceId } = c.req.valid("query");
 
       const member = (
-        await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+        await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
           Query.equal("workspaceId", workspaceId),
           Query.equal("userId", user.$id),
         ])
@@ -38,10 +38,11 @@ const app = new Hono()
         return c.json({ error: "Unauthorized" }, 401);
       }
 
-      const projects = await databases.listDocuments(DATABASE_ID, PROJECTS_ID, [
-        Query.equal("workspaceId", workspaceId),
-        Query.orderDesc("$createdAt"),
-      ]);
+      const projects = await databases.listDocuments<Project>(
+        DATABASE_ID,
+        PROJECTS_ID,
+        [Query.equal("workspaceId", workspaceId), Query.orderDesc("$createdAt")]
+      );
 
       return c.json({ data: projects });
     }
@@ -58,7 +59,7 @@ const app = new Hono()
       const { name, image, workspaceId } = c.req.valid("form");
 
       const member = (
-        await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+        await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
           Query.equal("workspaceId", workspaceId),
           Query.equal("userId", user.$id),
         ])
@@ -87,7 +88,7 @@ const app = new Hono()
         )}`;
       }
 
-      const project = await databases.createDocument(
+      const project = await databases.createDocument<Project>(
         DATABASE_ID,
         PROJECTS_ID,
         ID.unique(),
@@ -116,7 +117,7 @@ const app = new Hono()
       );
 
       const member = (
-        await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+        await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
           Query.equal("workspaceId", existingProject.workspaceId),
           Query.equal("userId", user.$id),
         ])
@@ -149,7 +150,7 @@ const app = new Hono()
         imageUrl = image;
       }
 
-      const project = await databases.updateDocument(
+      const project = await databases.updateDocument<Project>(
         DATABASE_ID,
         PROJECTS_ID,
         projectId,
@@ -172,7 +173,7 @@ const app = new Hono()
     );
 
     const member = (
-      await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+      await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
         Query.equal("workspaceId", existingProject.workspaceId),
         Query.equal("userId", user.$id),
       ])

@@ -2,7 +2,7 @@ import { Query } from "node-appwrite";
 
 import { createSessionClient } from "@/lib/appwrite";
 import { DATABASE_ID, MEMBERS_ID, PROJECTS_ID } from "@/lib/constants";
-import { Project } from "@/lib/types";
+import { Member, Project } from "@/lib/types";
 
 interface GetProjectProps {
   projectId: string;
@@ -21,7 +21,7 @@ export const getProject = async ({ projectId }: GetProjectProps) => {
     );
 
     const member = (
-      await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+      await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
         Query.equal("workspaceId", project.workspaceId),
         Query.equal("userId", user.$id),
       ])

@@ -2,7 +2,7 @@ import { Query } from "node-appwrite";
 
 import { createSessionClient } from "@/lib/appwrite";
 import { DATABASE_ID, MEMBERS_ID, WORKSPACES_ID } from "@/lib/constants";
-import { Workspace } from "@/lib/types";
+import { Member, Workspace } from "@/lib/types";
 
 export const getWorkspaces = async () => {
   try {
@@ -10,9 +10,11 @@ export const getWorkspaces = async () => {
 
     const user = await account.get();
 
-    const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
-      Query.equal("userId", user.$id),
-    ]);
+    const members = await databases.listDocuments<Member>(
+      DATABASE_ID,
+      MEMBERS_ID,
+      [Query.equal("userId", user.$id)]
+    );
 
     if (members.total === 0) {
       return { documents: [], total: 0 };
@@ -20,7 +22,7 @@ export const getWorkspaces = async () => {
 
     const workspaceIds = members.documents.map((member) => member.workspaceId);
 
-    const workspaces = await databases.listDocuments(
+    const workspaces = await databases.listDocuments<Workspace>(
       DATABASE_ID,
       WORKSPACES_ID,
       [Query.contains("$id", workspaceIds), Query.orderDesc("$createdAt")]
@@ -43,7 +45,7 @@ export const getWorkspace = async ({ workspaceId }: GetWorkspaceProps) => {
     const user = await account.get();
 
     const member = (
-      await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+      await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
         Query.equal("workspaceId", workspaceId),
         Query.equal("userId", user.$id),
       ])

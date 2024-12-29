@@ -9,7 +9,7 @@ import {
   WORKSPACES_ID,
 } from "@/lib/constants";
 import { sessionMiddleware } from "@/lib/session-middleware";
-import { MemberRole, Workspace } from "@/lib/types";
+import { Member, MemberRole, Workspace } from "@/lib/types";
 import { generateInviteCode } from "@/lib/utils";
 import {
   createWorkspaceSchema,
@@ -22,9 +22,11 @@ const app = new Hono()
     const databases = c.get("databases");
     const user = c.get("user");
 
-    const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
-      Query.equal("userId", user.$id),
-    ]);
+    const members = await databases.listDocuments<Member>(
+      DATABASE_ID,
+      MEMBERS_ID,
+      [Query.equal("userId", user.$id)]
+    );
 
     if (members.total === 0) {
       return c.json({ data: { documents: [], total: 0 } });
@@ -32,7 +34,7 @@ const app = new Hono()
 
     const workspaceIds = members.documents.map((member) => member.workspaceId);
 
-    const workspaces = await databases.listDocuments(
+    const workspaces = await databases.listDocuments<Workspace>(
       DATABASE_ID,
       WORKSPACES_ID,
       [Query.contains("$id", workspaceIds), Query.orderDesc("$createdAt")]
@@ -70,18 +72,23 @@ const app = new Hono()
         )}`;
       }
 
-      const workspace = await databases.createDocument(
+      const workspace = await databases.createDocument<Workspace>(
         DATABASE_ID,
         WORKSPACES_ID,
         ID.unique(),
         { name, userId: user.$id, imageUrl, inviteCode: generateInviteCode(6) }
       );
 
-      await databases.createDocument(DATABASE_ID, MEMBERS_ID, ID.unique(), {
-        userId: user.$id,
-        workspaceId: workspace.$id,
-        role: MemberRole.ADMIN,
-      });
+      await databases.createDocument<Member>(
+        DATABASE_ID,
+        MEMBERS_ID,
+        ID.unique(),
+        {
+          userId: user.$id,
+          workspaceId: workspace.$id,
+          role: MemberRole.ADMIN,
+        }
+      );
 
       return c.json({ data: workspace });
     }
@@ -99,7 +106,7 @@ const app = new Hono()
       const { name, image } = c.req.valid("form");
 
       const member = (
-        await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+        await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
           Query.equal("workspaceId", workspaceId),
           Query.equal("userId", user.$id),
         ])
@@ -132,7 +139,7 @@ const app = new Hono()
         imageUrl = image;
       }
 
-      const workspace = await databases.updateDocument(
+      const workspace = await databases.updateDocument<Workspace>(
         DATABASE_ID,
         WORKSPACES_ID,
         workspaceId,
@@ -149,7 +156,7 @@ const app = new Hono()
     const { workspaceId } = c.req.param();
 
     const member = (
-      await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+      await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
         Query.equal("workspaceId", workspaceId),
         Query.equal("userId", user.$id),
       ])
@@ -170,7 +177,7 @@ const app = new Hono()
     const { workspaceId } = c.req.param();
 
     const member = (
-      await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+      await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
         Query.equal("workspaceId", workspaceId),
         Query.equal("userId", user.$id),
       ])
@@ -180,7 +187,7 @@ const app = new Hono()
       return c.json({ error: "Unauthorized" }, 401);
     }
 
-    const workspace = await databases.updateDocument(
+    const workspace = await databases.updateDocument<Workspace>(
       DATABASE_ID,
       WORKSPACES_ID,
       workspaceId,
@@ -203,7 +210,7 @@ const app = new Hono()
       const { code } = c.req.valid("json");
 
       const member = (
-        await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+        await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
           Query.equal("workspaceId", workspaceId),
           Query.equal("userId", user.$id),
         ])
@@ -223,11 +230,16 @@ const app = new Hono()
         return c.json({ error: "Invalid invite code" }, 400);
       }
 
-      await databases.createDocument(DATABASE_ID, MEMBERS_ID, ID.unique(), {
-        workspaceId,
-        userId: user.$id,
-        role: MemberRole.MEMBER,
-      });
+      await databases.createDocument<Member>(
+        DATABASE_ID,
+        MEMBERS_ID,
+        ID.unique(),
+        {
+          workspaceId,
+          userId: user.$id,
+          role: MemberRole.MEMBER,
+        }
+      );
 
       return c.json({ data: workspace });
     }

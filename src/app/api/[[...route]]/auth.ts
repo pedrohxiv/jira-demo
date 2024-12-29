@@ -6,6 +6,7 @@ import { ID, Query } from "node-appwrite";
 import { createAdminClient } from "@/lib/appwrite";
 import { AUTH_COOKIE, DATABASE_ID, MEMBERS_ID } from "@/lib/constants";
 import { sessionMiddleware } from "@/lib/session-middleware";
+import { Member } from "@/lib/types";
 import {
   getCurrentUserSchema,
   signInSchema,
@@ -28,7 +29,7 @@ const app = new Hono()
         const databases = c.get("databases");
 
         const member = (
-          await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+          await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
             Query.equal("workspaceId", workspaceId),
             Query.equal("userId", user.$id),
           ])

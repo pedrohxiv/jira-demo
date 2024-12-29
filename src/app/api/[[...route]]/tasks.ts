@@ -28,7 +28,7 @@ const app = new Hono()
         c.req.valid("query");
 
       const member = (
-        await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+        await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
           Query.equal("workspaceId", workspaceId),
           Query.equal("userId", user.$id),
         ])
@@ -129,7 +129,7 @@ const app = new Hono()
       } = c.req.valid("json");
 
       const member = (
-        await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+        await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
           Query.equal("workspaceId", workspaceId),
           Query.equal("userId", user.$id),
         ])
@@ -155,7 +155,7 @@ const app = new Hono()
           ? highestPositionTask.documents[0].position + 1000
           : 1000;
 
-      const task = await databases.createDocument(
+      const task = await databases.createDocument<Task>(
         DATABASE_ID,
         TASKS_ID,
         ID.unique(),
