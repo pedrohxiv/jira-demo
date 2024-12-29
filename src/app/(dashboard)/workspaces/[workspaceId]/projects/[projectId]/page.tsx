@@ -7,7 +7,7 @@ import { getProject } from "@/actions/projects";
 import { ProjectAvatar } from "@/components/avatars/project-avatar";
 import { Button } from "@/components/ui/button";
 
-import { TaskSwitcher } from "./task-switcher";
+import { TaskViewSwitcher } from "./_components/task-view-switcher";
 
 interface Props {
   params: { workspaceId: string; projectId: string };
@@ -48,7 +48,7 @@ const ProjectPage = async ({ params }: Props) => {
           </Button>
         </div>
       </div>
-      <TaskSwitcher />
+      <TaskViewSwitcher workspaceId={params.workspaceId} />
     </div>
   );
 };

@@ -27,11 +27,11 @@ export const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
 
-  const { data: workspaces } = getWorkspaces();
-  const { data: projects } = getProjects({ workspaceId: params.workspaceId });
-
   const { open: openCreateWorkspace } = useCreateWorkspace();
   const { open: openCreateProject } = useCreateProject();
+
+  const { data: workspaces } = getWorkspaces();
+  const { data: projects } = getProjects({ workspaceId: params.workspaceId });
 
   const onSelect = (id: string) => {
     router.push(`/workspaces/${id}`);
