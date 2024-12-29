@@ -14,8 +14,8 @@ type RequestType = InferRequestType<
 >;
 
 export const signIn = () => {
-  const router = useRouter();
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const { toast } = useToast();
 
@@ -30,9 +30,9 @@ export const signIn = () => {
       return await response.json();
     },
     onSuccess: () => {
-      router.refresh();
-
       queryClient.invalidateQueries({ queryKey: ["current-user"] });
+
+      router.refresh();
     },
     onError: () => {
       toast({

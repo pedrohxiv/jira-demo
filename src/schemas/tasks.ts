@@ -20,5 +20,15 @@ export const createTaskSchema = z.object({
   projectId: z.string().min(1, "ProjectId is required"),
   dueDate: z.coerce.date(),
   assigneeId: z.string().min(1, "AssigneeId is required"),
+});
+
+export const updateTaskSchema = z.object({
+  name: z.string().trim().min(1, "Task name is required"),
+  status: z.nativeEnum(TaskStatus, {
+    required_error: "Task status is required",
+  }),
+  projectId: z.string().min(1, "ProjectId is required"),
+  dueDate: z.coerce.date(),
+  assigneeId: z.string().min(1, "AssigneeId is required"),
   description: z.string().optional(),
 });

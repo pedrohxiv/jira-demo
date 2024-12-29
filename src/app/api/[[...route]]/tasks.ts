@@ -11,7 +11,11 @@ import {
 } from "@/lib/constants";
 import { sessionMiddleware } from "@/lib/session-middleware";
 import { Member, Project, Task } from "@/lib/types";
-import { createTaskSchema, getTasksSchema } from "@/schemas/tasks";
+import {
+  createTaskSchema,
+  getTasksSchema,
+  updateTaskSchema,
+} from "@/schemas/tasks";
 
 const app = new Hono()
   .get(
@@ -110,6 +114,53 @@ const app = new Hono()
       return c.json({ data: { ...tasks, documents: populatedTasks } });
     }
   )
+  .get("/:taskId", sessionMiddleware, async (c) => {
+    const { users } = await createAdminClient();
+
+    const databases = c.get("databases");
+    const currentUser = c.get("user");
+
+    const { taskId } = c.req.param();
+
+    const task = await databases.getDocument<Task>(
+      DATABASE_ID,
+      TASKS_ID,
+      taskId
+    );
+
+    const existingMember = (
+      await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
+        Query.equal("workspaceId", task.workspaceId),
+        Query.equal("userId", currentUser.$id),
+      ])
+    ).documents[0];
+
+    if (!existingMember) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    const project = await databases.getDocument<Project>(
+      DATABASE_ID,
+      PROJECTS_ID,
+      task.projectId
+    );
+
+    const member = await databases.getDocument<Member>(
+      DATABASE_ID,
+      MEMBERS_ID,
+      task.assigneeId
+    );
+
+    const user = await users.get(member.userId);
+
+    const assignee = {
+      ...member,
+      name: user.name,
+      email: user.email,
+    };
+
+    return c.json({ data: { ...task, project, assignee } });
+  })
   .post(
     "/",
     sessionMiddleware,
@@ -118,15 +169,8 @@ const app = new Hono()
       const databases = c.get("databases");
       const user = c.get("user");
 
-      const {
-        name,
-        status,
-        workspaceId,
-        projectId,
-        dueDate,
-        assigneeId,
-        description,
-      } = c.req.valid("json");
+      const { name, status, workspaceId, projectId, dueDate, assigneeId } =
+        c.req.valid("json");
 
       const member = (
         await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
@@ -166,13 +210,85 @@ const app = new Hono()
           projectId,
           dueDate,
           assigneeId,
-          description,
           position: newPosition,
         }
       );
 
       return c.json({ data: task });
     }
-  );
+  )
+  .patch(
+    "/:taskId",
+    sessionMiddleware,
+    zValidator("json", updateTaskSchema),
+    async (c) => {
+      const databases = c.get("databases");
+      const user = c.get("user");
+
+      const { taskId } = c.req.param();
+      const { name, status, projectId, dueDate, assigneeId, description } =
+        c.req.valid("json");
+
+      const existingTask = await databases.getDocument<Task>(
+        DATABASE_ID,
+        TASKS_ID,
+        taskId
+      );
+
+      const member = (
+        await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
+          Query.equal("workspaceId", existingTask.workspaceId),
+          Query.equal("userId", user.$id),
+        ])
+      ).documents[0];
+
+      if (!member) {
+        return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      const task = await databases.updateDocument<Task>(
+        DATABASE_ID,
+        TASKS_ID,
+        taskId,
+        {
+          name,
+          status,
+          projectId,
+          dueDate,
+          assigneeId,
+          description,
+        }
+      );
+
+      return c.json({ data: task });
+    }
+  )
+  .delete("/:taskId", sessionMiddleware, async (c) => {
+    const databases = c.get("databases");
+    const user = c.get("user");
+
+    const { taskId } = c.req.param();
+
+    const existingTask = await databases.getDocument<Task>(
+      DATABASE_ID,
+      TASKS_ID,
+      taskId
+    );
+
+    const member = (
+      await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
+        Query.equal("workspaceId", existingTask.workspaceId),
+        Query.equal("userId", user.$id),
+      ])
+    ).documents[0];
+
+    if (!member) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    await databases.deleteDocument(DATABASE_ID, TASKS_ID, taskId);
+
+    return c.json({ data: { $id: taskId } });
+  });
 
 export default app;

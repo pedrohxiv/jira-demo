@@ -2,27 +2,16 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { differenceInDays, format } from "date-fns";
-import {
-  ArrowUpDown,
-  ExternalLink,
-  MoreVertical,
-  Pencil,
-  Trash,
-} from "lucide-react";
+import { ArrowUpDown, MoreVertical } from "lucide-react";
 
 import { MemberAvatar } from "@/components/avatars/member-avatar";
 import { ProjectAvatar } from "@/components/avatars/project-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Task } from "@/lib/types";
 import { cn, snakeCaseToTitleCase } from "@/lib/utils";
+
+import { TaskActions } from "./task-actions";
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -158,50 +147,11 @@ export const columns: ColumnDef<Task>[] = [
       const task = row.original;
 
       return (
-        <div className="flex items-center justify-center">
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="size-8 p-0">
-                <MoreVertical className="size-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => {}}
-                disabled={false}
-                className="cursor-pointer font-medium p-[10px]"
-              >
-                <ExternalLink className="size-4 mr-2 stroke-2" />
-                Task Details
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {}}
-                disabled={false}
-                className="cursor-pointer font-medium p-[10px]"
-              >
-                <ExternalLink className="size-4 mr-2 stroke-2" />
-                Open Project
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {}}
-                disabled={false}
-                className="cursor-pointer font-medium p-[10px]"
-              >
-                <Pencil className="size-4 mr-2 stroke-2" />
-                Edit Task
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {}}
-                disabled={false}
-                className="cursor-pointer text-amber-700 focus:text-amber-700 font-medium p-[10px]"
-              >
-                <Trash className="size-4 mr-2 stroke-2" />
-                Delete Task
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <TaskActions task={task}>
+          <Button variant="ghost" className="size-8 p-0">
+            <MoreVertical className="size-4" />
+          </Button>
+        </TaskActions>
       );
     },
   },

@@ -6,24 +6,24 @@ import { useToast } from "@/hooks/use-toast";
 import { client } from "@/lib/rpc";
 
 type ResponseType = InferResponseType<
-  (typeof client.api.projects)[":projectId"]["$patch"],
+  (typeof client.api.tasks)[":taskId"]["$patch"],
   200
 >;
 type RequestType = InferRequestType<
-  (typeof client.api.projects)[":projectId"]["$patch"]
+  (typeof client.api.tasks)[":taskId"]["$patch"]
 >;
 
-export const updateProject = () => {
+export const updateTask = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
 
   const { toast } = useToast();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ param, form }) => {
-      const response = await client.api.projects[":projectId"]["$patch"]({
+    mutationFn: async ({ param, json }) => {
+      const response = await client.api.tasks[":taskId"]["$patch"]({
         param,
-        form,
+        json,
       });
 
       if (!response.ok) {
@@ -33,8 +33,8 @@ export const updateProject = () => {
       return await response.json();
     },
     onSuccess: ({ data }) => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      queryClient.invalidateQueries({ queryKey: ["project", data.$id] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["task", data.$id] });
 
       router.refresh();
     },

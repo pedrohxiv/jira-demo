@@ -11,8 +11,8 @@ type ResponseType = InferResponseType<
 >;
 
 export const signOut = () => {
-  const router = useRouter();
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const { toast } = useToast();
 
@@ -27,10 +27,10 @@ export const signOut = () => {
       return await response.json();
     },
     onSuccess: () => {
-      router.refresh();
-
       queryClient.invalidateQueries({ queryKey: ["current-user"] });
       queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+
+      router.refresh();
     },
     onError: () => {
       toast({
