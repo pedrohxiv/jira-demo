@@ -1,10 +1,12 @@
-import { SettingsIcon, UsersIcon } from "lucide-react";
+import { Settings, Users } from "lucide-react";
 import {
   GoCheckCircle,
   GoCheckCircleFill,
   GoHome,
   GoHomeFill,
 } from "react-icons/go";
+
+import { TaskStatus } from "@/lib/types";
 
 export const routes = [
   { label: "Home", href: "", icon: GoHome, activeIcon: GoHomeFill },
@@ -17,15 +19,23 @@ export const routes = [
   {
     label: "Settings",
     href: "/settings",
-    icon: SettingsIcon,
-    activeIcon: SettingsIcon,
+    icon: Settings,
+    activeIcon: Settings,
   },
   {
     label: "Members",
     href: "/members",
-    icon: UsersIcon,
-    activeIcon: UsersIcon,
+    icon: Users,
+    activeIcon: Users,
   },
+];
+
+export const boards: TaskStatus[] = [
+  TaskStatus.BACKLOG,
+  TaskStatus.TODO,
+  TaskStatus.IN_PROGRESS,
+  TaskStatus.IN_REVIEW,
+  TaskStatus.DONE,
 ];
 
 export const AUTH_COOKIE = "jira-demo-session";

@@ -42,3 +42,7 @@ export type Task = Models.Document & {
   status: TaskStatus;
   position: number;
 };
+
+export type TasksState = {
+  [key in TaskStatus]: Task[];
+};

@@ -12,6 +12,7 @@ import { getTasks } from "@/queries/get-tasks";
 
 import { columns } from "./columns";
 import { DataFilters } from "./data-filters";
+import { DataKanban } from "./data-kanban";
 import { DataTable } from "./data-table";
 
 interface Props {
@@ -66,7 +67,9 @@ export const TaskViewSwitcher = ({ workspaceId }: Props) => {
             <TabsContent value="table" className="mt-0">
               <DataTable columns={columns} data={data.documents} />
             </TabsContent>
-            <TabsContent value="kanban" className="mt-0"></TabsContent>
+            <TabsContent value="kanban" className="mt-0">
+              <DataKanban data={data.documents} />
+            </TabsContent>
             <TabsContent value="calendar" className="mt-0"></TabsContent>
           </>
         )}
