@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
+import { useCallback } from "react";
 
 import { DottedSeparator } from "@/components/dotted-separator";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCreateTask } from "@/hooks/use-create-task";
 import { useTaskFilters } from "@/hooks/use-task-filters";
 import { useTaskView } from "@/hooks/use-task-view";
+import { TaskStatus } from "@/lib/types";
+import { bulkUpdateTasks } from "@/mutations/bulk-update-tasks";
 import { getTasks } from "@/queries/get-tasks";
 
 import { columns } from "./columns";
@@ -32,6 +35,14 @@ export const TaskViewSwitcher = ({ workspaceId }: Props) => {
     dueDate,
     search,
   });
+  const { mutate, isPending } = bulkUpdateTasks();
+
+  const handleKanbanChange = useCallback(
+    (tasks: { $id: string; status: TaskStatus; position: number }[]) => {
+      mutate({ json: { tasks } });
+    },
+    [mutate]
+  );
 
   return (
     <Tabs
@@ -68,7 +79,7 @@ export const TaskViewSwitcher = ({ workspaceId }: Props) => {
               <DataTable columns={columns} data={data.documents} />
             </TabsContent>
             <TabsContent value="kanban" className="mt-0">
-              <DataKanban data={data.documents} />
+              <DataKanban data={data.documents} onChange={handleKanbanChange} />
             </TabsContent>
             <TabsContent value="calendar" className="mt-0"></TabsContent>
           </>

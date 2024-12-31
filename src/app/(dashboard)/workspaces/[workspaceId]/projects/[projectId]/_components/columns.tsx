@@ -1,7 +1,6 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { differenceInDays, format } from "date-fns";
 import { ArrowUpDown, MoreVertical } from "lucide-react";
 
 import { MemberAvatar } from "@/components/avatars/member-avatar";
@@ -9,9 +8,10 @@ import { ProjectAvatar } from "@/components/avatars/project-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/lib/types";
-import { cn, snakeCaseToTitleCase } from "@/lib/utils";
+import { snakeCaseToTitleCase } from "@/lib/utils";
 
 import { TaskActions } from "./task-actions";
+import { TaskDate } from "./task-date";
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -105,21 +105,7 @@ export const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => {
       const dueDate = row.original.dueDate;
 
-      const diffInDays = differenceInDays(new Date(dueDate), new Date());
-
-      let textColor = "text-muted-foreground";
-
-      if (diffInDays <= 3) {
-        textColor = "text-red-500";
-      } else if (diffInDays <= 7) {
-        textColor = "text-orange-500";
-      } else if (diffInDays <= 14) {
-        textColor = "text-yellow-500";
-      }
-
-      return (
-        <p className={cn("truncate", textColor)}>{format(dueDate, "PPP")}</p>
-      );
+      return <TaskDate value={dueDate} />
     },
   },
   {

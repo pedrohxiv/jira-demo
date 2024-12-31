@@ -1,4 +1,9 @@
-import { DragDropContext } from "@hello-pangea/dnd";
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from "@hello-pangea/dnd";
 import {
   Circle,
   CircleCheck,
@@ -7,13 +12,15 @@ import {
   CircleDotDashed,
   Plus,
 } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { useCreateTask } from "@/hooks/use-create-task";
 import { boards } from "@/lib/constants";
 import { Task, TasksState, TaskStatus } from "@/lib/types";
 import { snakeCaseToTitleCase } from "@/lib/utils";
+
+import { KanbanCard } from "./kanban-card";
 
 const statusIconMap: Record<TaskStatus, React.ReactNode> = {
   [TaskStatus.BACKLOG]: (
@@ -29,9 +36,16 @@ const statusIconMap: Record<TaskStatus, React.ReactNode> = {
 
 interface Props {
   data: Task[];
+  onChange: (
+    tasks: {
+      $id: string;
+      status: TaskStatus;
+      position: number;
+    }[]
+  ) => void;
 }
 
-export const DataKanban = ({ data }: Props) => {
+export const DataKanban = ({ data, onChange }: Props) => {
   const [tasks, setTasks] = useState<TasksState>(() => {
     const initialTasks: TasksState = {
       [TaskStatus.BACKLOG]: [],
@@ -56,8 +70,117 @@ export const DataKanban = ({ data }: Props) => {
 
   const { open } = useCreateTask();
 
+  const handleDragEnd = useCallback(
+    (result: DropResult) => {
+      if (!result.destination) {
+        return;
+      }
+
+      const sourceStatus = result.source.droppableId as TaskStatus;
+      const destinationStatus = result.destination.droppableId as TaskStatus;
+
+      let updatesPayload: {
+        $id: string;
+        status: TaskStatus;
+        position: number;
+      }[] = [];
+
+      setTasks((prevTasks) => {
+        const newTasks = { ...prevTasks };
+
+        const sourceColumn = [...newTasks[sourceStatus]];
+
+        const [movedTask] = sourceColumn.splice(result.source.index, 1);
+
+        if (!movedTask) {
+          return prevTasks;
+        }
+
+        const updatedMovedTask =
+          sourceStatus !== destinationStatus
+            ? { ...movedTask, status: destinationStatus }
+            : movedTask;
+
+        newTasks[sourceStatus] = sourceColumn;
+
+        const destinationColumn = [...newTasks[destinationStatus]];
+
+        destinationColumn.splice(
+          result.destination!.index,
+          0,
+          updatedMovedTask
+        );
+
+        newTasks[destinationStatus] = destinationColumn;
+
+        updatesPayload = [];
+
+        updatesPayload.push({
+          $id: updatedMovedTask.$id,
+          status: destinationStatus,
+          position: Math.min((result.destination!.index + 1) * 1000, 1_000_000),
+        });
+
+        newTasks[destinationStatus].forEach((task, index) => {
+          if (task && task.$id !== updatedMovedTask.$id) {
+            const newPosition = Math.min((index + 1) * 1000, 1_000_000);
+
+            if (task.position !== newPosition) {
+              updatesPayload.push({
+                $id: task.$id,
+                status: destinationStatus,
+                position: newPosition,
+              });
+            }
+          }
+        });
+
+        if (sourceStatus !== destinationStatus) {
+          newTasks[sourceStatus].forEach((task, index) => {
+            if (task) {
+              const newPosition = Math.min((index + 1) * 1000, 1_000_000);
+
+              if (task.position !== newPosition) {
+                updatesPayload.push({
+                  $id: task.$id,
+                  status: sourceStatus,
+                  position: newPosition,
+                });
+              }
+            }
+          });
+        }
+
+        return newTasks;
+      });
+
+      onChange(updatesPayload);
+    },
+    [onChange]
+  );
+
+  useEffect(() => {
+    const newTasks: TasksState = {
+      [TaskStatus.BACKLOG]: [],
+      [TaskStatus.TODO]: [],
+      [TaskStatus.IN_PROGRESS]: [],
+      [TaskStatus.IN_REVIEW]: [],
+      [TaskStatus.DONE]: [],
+    };
+
+    data.forEach((task) => {
+      newTasks[task.status].push(task);
+    });
+
+    Object.keys(newTasks).forEach((status) => {
+      newTasks[status as TaskStatus].sort((a, b) => a.position - b.position);
+    });
+
+    setTasks(newTasks);
+  }, [data]);
+
   return (
-    <DragDropContext onDragEnd={() => {}}>
+    <DragDropContext onDragEnd={handleDragEnd}>
       <div className="flex overflow-x-auto">
         {boards.map((board) => (
           <div
@@ -83,6 +206,34 @@ export const DataKanban = ({ data }: Props) => {
                 <Plus className="size-4 text-neutral-500" />
               </Button>
             </div>
+            <Droppable droppableId={board}>
+              {({ droppableProps, innerRef, placeholder }) => (
+                <div
+                  {...droppableProps}
+                  ref={innerRef}
+                  className="min-h-[200px] py-1.5"
+                >
+                  {tasks[board].map((task, index) => (
+                    <Draggable
+                      key={task.$id}
+                      draggableId={task.$id}
+                      index={index}
+                    >
+                      {({ draggableProps, dragHandleProps, innerRef }) => (
+                        <div
+                          {...draggableProps}
+                          {...dragHandleProps}
+                          ref={innerRef}
+                        >
+                          <KanbanCard task={task} />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {placeholder}
+                </div>
+              )}
+            </Droppable>
           </div>
         ))}
       </div>

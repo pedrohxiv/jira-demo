@@ -22,6 +22,16 @@ export const createTaskSchema = z.object({
   assigneeId: z.string().min(1, "AssigneeId is required"),
 });
 
+export const bulkUpdateTaskSchema = z.object({
+  tasks: z.array(
+    z.object({
+      $id: z.string(),
+      status: z.nativeEnum(TaskStatus),
+      position: z.number().int().positive().min(1000).max(1_000_000),
+    })
+  ),
+});
+
 export const updateTaskSchema = z.object({
   name: z.string().trim().min(1, "Task name is required"),
   status: z.nativeEnum(TaskStatus, {

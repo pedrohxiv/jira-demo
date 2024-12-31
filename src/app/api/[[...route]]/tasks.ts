@@ -12,11 +12,11 @@ import {
 import { sessionMiddleware } from "@/lib/session-middleware";
 import { Member, Project, Task } from "@/lib/types";
 import {
+  bulkUpdateTaskSchema,
   createTaskSchema,
   getTasksSchema,
   updateTaskSchema,
 } from "@/schemas/tasks";
-
 const app = new Hono()
   .get(
     "/",
@@ -215,6 +215,66 @@ const app = new Hono()
       );
 
       return c.json({ data: task });
+    }
+  )
+  .patch(
+    "/bulk-update",
+    sessionMiddleware,
+    zValidator("json", bulkUpdateTaskSchema),
+    async (c) => {
+      const databases = c.get("databases");
+      const user = c.get("user");
+
+      const { tasks } = c.req.valid("json");
+
+      const taskToUpdate = await databases.listDocuments<Task>(
+        DATABASE_ID,
+        TASKS_ID,
+        [
+          Query.contains(
+            "$id",
+            tasks.map((task) => task.$id)
+          ),
+        ]
+      );
+
+      const workspaceIds = new Set(
+        taskToUpdate.documents.map((task) => task.workspaceId)
+      );
+
+      if (workspaceIds.size !== 1) {
+        return c.json({ error: "All tasks must belong to he same workspace" });
+      }
+
+      const workspaceId = workspaceIds.values().next().value;
+
+      if (!workspaceId) {
+        return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      const member = (
+        await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
+          Query.equal("workspaceId", workspaceId),
+          Query.equal("userId", user.$id),
+        ])
+      ).documents[0];
+
+      if (!member) {
+        return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      const updatedTasks = await Promise.all(
+        tasks.map(async (task) => {
+          const { $id, status, position } = task;
+
+          return databases.updateDocument<Task>(DATABASE_ID, TASKS_ID, $id, {
+            status,
+            position,
+          });
+        })
+      );
+
+      return c.json({ data: updatedTasks });
     }
   )
   .patch(
