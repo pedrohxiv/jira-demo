@@ -14,6 +14,7 @@ import { bulkUpdateTasks } from "@/mutations/bulk-update-tasks";
 import { getTasks } from "@/queries/get-tasks";
 
 import { columns } from "./columns";
+import { DataCalendar } from "./data-calendar";
 import { DataFilters } from "./data-filters";
 import { DataKanban } from "./data-kanban";
 import { DataTable } from "./data-table";
@@ -72,7 +73,7 @@ export const TaskViewSwitcher = ({ workspaceId }: Props) => {
         <DataFilters workspaceId={workspaceId} />
         <DottedSeparator className="my-4" />
         {!data ? (
-          <></>
+          <div className="w-full h-64 rounded-md bg-muted animate-pulse" />
         ) : (
           <>
             <TabsContent value="table" className="mt-0">
@@ -81,7 +82,9 @@ export const TaskViewSwitcher = ({ workspaceId }: Props) => {
             <TabsContent value="kanban" className="mt-0">
               <DataKanban data={data.documents} onChange={handleKanbanChange} />
             </TabsContent>
-            <TabsContent value="calendar" className="mt-0"></TabsContent>
+            <TabsContent value="calendar" className="mt-0 h-full pb-4">
+              <DataCalendar data={data.documents} />
+            </TabsContent>
           </>
         )}
       </div>
