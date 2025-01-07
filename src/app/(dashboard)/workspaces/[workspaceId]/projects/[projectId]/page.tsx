@@ -5,9 +5,8 @@ import { redirect } from "next/navigation";
 import { auth } from "@/actions/auth";
 import { getProject } from "@/actions/projects";
 import { ProjectAvatar } from "@/components/avatars/project-avatar";
+import { TaskViewSwitcher } from "@/components/task-view-switcher";
 import { Button } from "@/components/ui/button";
-
-import { TaskViewSwitcher } from "./_components/task-view-switcher";
 
 interface Props {
   params: { workspaceId: string; projectId: string };
@@ -48,7 +47,7 @@ const ProjectPage = async ({ params }: Props) => {
           </Button>
         </div>
       </div>
-      <TaskViewSwitcher workspaceId={params.workspaceId} />
+      <TaskViewSwitcher workspaceId={params.workspaceId} hideProjectFilter />
     </div>
   );
 };

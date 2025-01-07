@@ -48,7 +48,11 @@ export const CreateTaskForm = ({ onCancel }: Props) => {
   const form = useForm<z.infer<typeof createTaskSchema>>({
     resolver: zodResolver(createTaskSchema.omit({ workspaceId: true })),
     defaultValues: {
-      workspaceId: params.workspaceId,
+      name: "",
+      dueDate: undefined,
+      status: undefined,
+      assigneeId: undefined,
+      projectId: undefined,
     },
   });
 

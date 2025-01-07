@@ -10,17 +10,21 @@ import {
   CircleDashed,
   CircleDot,
   CircleDotDashed,
+  MoreHorizontal,
   Plus,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
+import { MemberAvatar } from "@/components/avatars/member-avatar";
+import { ProjectAvatar } from "@/components/avatars/project-avatar";
+import { DottedSeparator } from "@/components/dotted-separator";
+import { TaskActions } from "@/components/task-actions";
+import { TaskDate } from "@/components/task-date";
 import { Button } from "@/components/ui/button";
 import { useCreateTask } from "@/hooks/use-create-task";
 import { boards } from "@/lib/constants";
 import { Task, TasksState, TaskStatus } from "@/lib/types";
 import { snakeCaseToTitleCase } from "@/lib/utils";
-
-import { KanbanCard } from "./kanban-card";
 
 const statusIconMap: Record<TaskStatus, React.ReactNode> = {
   [TaskStatus.BACKLOG]: (
@@ -225,7 +229,38 @@ export const DataKanban = ({ data, onChange }: Props) => {
                           {...dragHandleProps}
                           ref={innerRef}
                         >
-                          <KanbanCard task={task} />
+                          <div className="bg-white p-2.5 mb-1.5 rounded shadow-sm space-y-3">
+                            <div className="flex items-start justify-between gap-x-2">
+                              <p className="text-sm line-clamp-2">
+                                {task.name}
+                              </p>
+                              <TaskActions task={task}>
+                                <MoreHorizontal className="size-[18px] stroke-1 shrink-0 text-neutral-700 hover:opacity-75 transition cursor-pointer" />
+                              </TaskActions>
+                            </div>
+                            <DottedSeparator />
+                            <div className="flex items-center gap-x-1.5">
+                              <MemberAvatar
+                                name={task.assignee.name}
+                                fallbackClassName="text-[10px]"
+                              />
+                              <div className="size-1 rounded-full bg-neutral-300" />
+                              <TaskDate
+                                value={task.dueDate}
+                                className="text-xs"
+                              />
+                            </div>
+                            <div className="flex items-center gap-x-1.5">
+                              <ProjectAvatar
+                                name={task.project.name}
+                                image={task.project.imageUrl}
+                                fallbackClassName="text-[10px]"
+                              />
+                              <span className="text-xs font-medium">
+                                {task.project.name}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </Draggable>

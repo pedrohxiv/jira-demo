@@ -112,32 +112,34 @@ export const DataFilters = ({ workspaceId, hideProjectFilter }: Props) => {
           ))}
         </SelectContent>
       </Select>
-      <Select
-        defaultValue={projectId ?? undefined}
-        onValueChange={(value) => handleProjectChange(value)}
-      >
-        <SelectTrigger className="w-full lg:w-auto h-8">
-          <div className="flex items-center pr-2">
-            <Folder className="size-4 mr-2" />
-            <SelectValue placeholder="All Projects" />
-          </div>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem className="cursor-pointer" value="all">
-            All Projects
-          </SelectItem>
-          <SelectSeparator />
-          {projectOptions?.map((project) => (
-            <SelectItem
-              key={project.value}
-              value={project.value}
-              className="cursor-pointer"
-            >
-              {project.label}
+      {!hideProjectFilter && (
+        <Select
+          defaultValue={projectId ?? undefined}
+          onValueChange={(value) => handleProjectChange(value)}
+        >
+          <SelectTrigger className="w-full lg:w-auto h-8">
+            <div className="flex items-center pr-2">
+              <Folder className="size-4 mr-2" />
+              <SelectValue placeholder="All Projects" />
+            </div>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem className="cursor-pointer" value="all">
+              All Projects
             </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+            <SelectSeparator />
+            {projectOptions?.map((project) => (
+              <SelectItem
+                key={project.value}
+                value={project.value}
+                className="cursor-pointer"
+              >
+                {project.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
       <DatePicker
         placeholder="Due Date"
         className="h-8 w-full lg:w-auto text-accent-foreground hover:bg-transparent"

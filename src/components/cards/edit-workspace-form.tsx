@@ -30,10 +30,10 @@ import { updateWorkspaceSchema } from "@/schemas/workspaces";
 
 interface Props {
   onCancel?: () => void;
-  initialValues: Workspace;
+  workspace: Workspace;
 }
 
-export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
+export const EditWorkspaceForm = ({ onCancel, workspace }: Props) => {
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [DeleteWorkspaceDialog, confirmDeleteWorkspace] = useConfirm(
     "Delete Workspace",
@@ -58,10 +58,13 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
 
   const form = useForm<z.infer<typeof updateWorkspaceSchema>>({
     resolver: zodResolver(updateWorkspaceSchema),
-    defaultValues: { ...initialValues, image: initialValues.imageUrl ?? "" },
+    defaultValues: {
+      name: workspace.name,
+      image: workspace.imageUrl,
+    },
   });
 
-  const fullInviteLink = `${window.location.origin}/workspaces/${initialValues.$id}/join/${initialValues.inviteCode}`;
+  const fullInviteLink = `${window.location.origin}/workspaces/${workspace.$id}/join/${workspace.inviteCode}`;
   const isPending =
     updateWorkspaceIsPending ||
     deleteWorkspaceIsPending ||
@@ -77,7 +80,7 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
 
   const handleFormSubmit = (values: z.infer<typeof updateWorkspaceSchema>) => {
     updateWorkspaceMutate({
-      param: { workspaceId: initialValues.$id },
+      param: { workspaceId: workspace.$id },
       form: {
         ...values,
         image: values.image instanceof File ? values.image : "",
@@ -93,7 +96,7 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
     }
 
     deleteWorkspaceMutate(
-      { param: { workspaceId: initialValues.$id } },
+      { param: { workspaceId: workspace.$id } },
       {
         onSuccess: () => {
           window.location.href = "/";
@@ -119,7 +122,7 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
       return;
     }
 
-    resetInviteCodeMutate({ param: { workspaceId: initialValues.$id } });
+    resetInviteCodeMutate({ param: { workspaceId: workspace.$id } });
   };
 
   return (
@@ -137,9 +140,7 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: Props) => {
             <ArrowLeft className="size-4" />
             Back
           </Button>
-          <CardTitle className="text-xl font-bold">
-            {initialValues.name}
-          </CardTitle>
+          <CardTitle className="text-xl font-bold">{workspace.name}</CardTitle>
         </CardHeader>
         <DottedSeparator className="px-7" />
         <CardContent className="p-7">

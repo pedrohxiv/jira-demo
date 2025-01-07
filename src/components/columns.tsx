@@ -5,13 +5,12 @@ import { ArrowUpDown, MoreVertical } from "lucide-react";
 
 import { MemberAvatar } from "@/components/avatars/member-avatar";
 import { ProjectAvatar } from "@/components/avatars/project-avatar";
+import { TaskActions } from "@/components/task-actions";
+import { TaskDate } from "@/components/task-date";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/lib/types";
 import { snakeCaseToTitleCase } from "@/lib/utils";
-
-import { TaskActions } from "./task-actions";
-import { TaskDate } from "./task-date";
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -105,7 +104,7 @@ export const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => {
       const dueDate = row.original.dueDate;
 
-      return <TaskDate value={dueDate} />
+      return <TaskDate value={dueDate} />;
     },
   },
   {

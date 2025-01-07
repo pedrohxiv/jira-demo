@@ -3,6 +3,11 @@
 import { Plus } from "lucide-react";
 import { useCallback } from "react";
 
+import { columns } from "@/components/columns";
+import { DataCalendar } from "@/components/data-calendar";
+import { DataFilters } from "@/components/data-filters";
+import { DataKanban } from "@/components/data-kanban";
+import { DataTable } from "@/components/data-table";
 import { DottedSeparator } from "@/components/dotted-separator";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,17 +18,12 @@ import { TaskStatus } from "@/lib/types";
 import { bulkUpdateTasks } from "@/mutations/bulk-update-tasks";
 import { getTasks } from "@/queries/get-tasks";
 
-import { columns } from "./columns";
-import { DataCalendar } from "./data-calendar";
-import { DataFilters } from "./data-filters";
-import { DataKanban } from "./data-kanban";
-import { DataTable } from "./data-table";
-
 interface Props {
   workspaceId: string;
+  hideProjectFilter?: boolean;
 }
 
-export const TaskViewSwitcher = ({ workspaceId }: Props) => {
+export const TaskViewSwitcher = ({ workspaceId, hideProjectFilter }: Props) => {
   const { open } = useCreateTask();
   const { view, setView } = useTaskView();
   const { projectId, assigneeId, status, dueDate, search } = useTaskFilters();
@@ -70,7 +70,10 @@ export const TaskViewSwitcher = ({ workspaceId }: Props) => {
           </Button>
         </div>
         <DottedSeparator className="my-4" />
-        <DataFilters workspaceId={workspaceId} />
+        <DataFilters
+          workspaceId={workspaceId}
+          hideProjectFilter={hideProjectFilter}
+        />
         <DottedSeparator className="my-4" />
         {!data ? (
           <div className="w-full h-64 rounded-md bg-muted animate-pulse" />

@@ -29,10 +29,10 @@ import { updateProjectSchema } from "@/schemas/projects";
 
 interface Props {
   onCancel?: () => void;
-  initialValues: Project;
+  project: Project;
 }
 
-export const EditProjectForm = ({ onCancel, initialValues }: Props) => {
+export const EditProjectForm = ({ onCancel, project }: Props) => {
   const [DeleteProjectDialog, confirmDeleteProject] = useConfirm(
     "Delete Project",
     "This action cannot be undone.",
@@ -49,7 +49,10 @@ export const EditProjectForm = ({ onCancel, initialValues }: Props) => {
 
   const form = useForm<z.infer<typeof updateProjectSchema>>({
     resolver: zodResolver(updateProjectSchema),
-    defaultValues: { ...initialValues, image: initialValues.imageUrl ?? "" },
+    defaultValues: {
+      name: project.name,
+      image: project.imageUrl,
+    },
   });
 
   const isPending = updateProjectIsPending || deleteProjectIsPending;
@@ -64,7 +67,7 @@ export const EditProjectForm = ({ onCancel, initialValues }: Props) => {
 
   const handleFormSubmit = (values: z.infer<typeof updateProjectSchema>) => {
     updateProjectMutate({
-      param: { projectId: initialValues.$id },
+      param: { projectId: project.$id },
       form: {
         ...values,
         image: values.image instanceof File ? values.image : "",
@@ -80,10 +83,10 @@ export const EditProjectForm = ({ onCancel, initialValues }: Props) => {
     }
 
     deleteProjectMutate(
-      { param: { projectId: initialValues.$id } },
+      { param: { projectId: project.$id } },
       {
         onSuccess: () => {
-          window.location.href = `/workspaces/${initialValues.workspaceId}`;
+          window.location.href = `/workspaces/${project.workspaceId}`;
         },
       }
     );
@@ -103,9 +106,7 @@ export const EditProjectForm = ({ onCancel, initialValues }: Props) => {
             <ArrowLeft className="size-4" />
             Back
           </Button>
-          <CardTitle className="text-xl font-bold">
-            {initialValues.name}
-          </CardTitle>
+          <CardTitle className="text-xl font-bold">{project.name}</CardTitle>
         </CardHeader>
         <DottedSeparator className="px-7" />
         <CardContent className="p-7">

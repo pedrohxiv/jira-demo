@@ -23,7 +23,7 @@ const ProjectSettingPage = async ({ params }: Props) => {
 
   return (
     <div className="w-full lg:max-w-xl">
-      <EditProjectForm initialValues={project} />
+      <EditProjectForm project={project} />
     </div>
   );
 };

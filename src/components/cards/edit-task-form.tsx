@@ -51,8 +51,11 @@ export const EditTaskForm = ({ onCancel, taskId }: Props) => {
   const form = useForm<z.infer<typeof updateTaskSchema>>({
     resolver: zodResolver(updateTaskSchema.omit({ description: true })),
     defaultValues: {
-      ...task,
+      name: task ? task.name : "",
       dueDate: task ? new Date(task.dueDate) : undefined,
+      status: task ? task.status : undefined,
+      assigneeId: task ? task.assigneeId : undefined,
+      projectId: task ? task.projectId : undefined,
     },
   });
 
@@ -127,7 +130,7 @@ export const EditTaskForm = ({ onCancel, taskId }: Props) => {
                 name="status"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem key={field.value}>
                     <FormLabel>Status</FormLabel>
                     <Select
                       defaultValue={field.value}
@@ -186,7 +189,7 @@ export const EditTaskForm = ({ onCancel, taskId }: Props) => {
                 name="assigneeId"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem key={field.value}>
                     <FormLabel>Assignee</FormLabel>
                     <Select
                       defaultValue={field.value}
@@ -230,7 +233,7 @@ export const EditTaskForm = ({ onCancel, taskId }: Props) => {
                 name="projectId"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem key={field.value}>
                     <FormLabel>Project</FormLabel>
                     <Select
                       defaultValue={field.value}

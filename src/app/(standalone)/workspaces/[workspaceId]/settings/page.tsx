@@ -23,7 +23,7 @@ const WorkspaceSettingPage = async ({ params }: Props) => {
 
   return (
     <div className="w-full lg:max-w-xl">
-      <EditWorkspaceForm initialValues={workspace} />
+      <EditWorkspaceForm workspace={workspace} />
     </div>
   );
 };
