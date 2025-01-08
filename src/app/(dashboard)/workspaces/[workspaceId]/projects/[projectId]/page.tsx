@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/actions/auth";
 import { getProject } from "@/actions/projects";
+import { Analytics } from "@/components/analytics";
 import { ProjectAvatar } from "@/components/avatars/project-avatar";
 import { TaskViewSwitcher } from "@/components/task-view-switcher";
 import { Button } from "@/components/ui/button";
@@ -36,17 +37,16 @@ const ProjectPage = async ({ params }: Props) => {
           />
           <h2 className="text-lg font-semibold">{project.name}</h2>
         </div>
-        <div className="">
-          <Button variant="secondary" size="sm" asChild>
-            <Link
-              href={`/workspaces/${params.workspaceId}/projects/${project.$id}/settings`}
-            >
-              <Pencil className="size-4 mr-2" />
-              Edit Project
-            </Link>
-          </Button>
-        </div>
+        <Button variant="secondary" size="sm" asChild>
+          <Link
+            href={`/workspaces/${params.workspaceId}/projects/${project.$id}/settings`}
+          >
+            <Pencil className="size-4 mr-2" />
+            Edit Project
+          </Link>
+        </Button>
       </div>
+      <Analytics projectId={params.projectId} />
       <TaskViewSwitcher workspaceId={params.workspaceId} hideProjectFilter />
     </div>
   );

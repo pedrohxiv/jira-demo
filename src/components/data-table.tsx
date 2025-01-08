@@ -45,7 +45,7 @@ export const DataTable = <TData, TValue>({
   });
 
   return (
-    <div>
+    <>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -114,6 +114,6 @@ export const DataTable = <TData, TValue>({
           Next
         </Button>
       </div>
-    </div>
+    </>
   );
 };
