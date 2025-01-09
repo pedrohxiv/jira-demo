@@ -46,3 +46,18 @@ export type Task = Models.Document & {
 export type TasksState = {
   [key in TaskStatus]: Task[];
 };
+
+export type AnalyticsResponse =
+  | {
+      taskCount: number;
+      taskDifference: number;
+      assignedTaskCount: number;
+      assignedTaskDifference: number;
+      incompleteTaskCount: number;
+      incompleteTaskDifference: number;
+      completedTaskCount: number;
+      completedTaskDifference: number;
+      overdueTaskCount: number;
+      overdueTaskDifference: number;
+    }
+  | undefined;

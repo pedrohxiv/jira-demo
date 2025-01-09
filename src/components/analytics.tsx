@@ -3,14 +3,29 @@
 import { AnalyticsCard } from "@/components/analytics-card";
 import { DottedSeparator } from "@/components/dotted-separator";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { AnalyticsResponse } from "@/lib/types";
 import { getProjectAnalytics } from "@/queries/get-project-analytics";
+import { getWorkspaceAnalytics } from "@/queries/get-workspace-analytics";
 
 interface Props {
-  projectId: string;
+  projectId?: string;
+  workspaceId?: string;
 }
 
-export const Analytics = ({ projectId }: Props) => {
-  const { data } = getProjectAnalytics({ projectId });
+export const Analytics = ({ projectId, workspaceId }: Props) => {
+  let data: AnalyticsResponse;
+
+  if (projectId) {
+    const { data: projectAnalytics } = getProjectAnalytics({ projectId });
+
+    data = projectAnalytics;
+  }
+
+  if (workspaceId) {
+    const { data: workspaceAnalytics } = getWorkspaceAnalytics({ workspaceId });
+
+    data = workspaceAnalytics;
+  }
 
   if (!data) {
     return (

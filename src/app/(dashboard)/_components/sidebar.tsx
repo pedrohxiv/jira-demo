@@ -63,21 +63,22 @@ export const Sidebar = () => {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {workspaces?.documents.map((workspace) => (
-              <SelectItem
-                key={workspace.$id}
-                value={workspace.$id}
-                className="cursor-pointer"
-              >
-                <div className="flex justify-start items-center gap-3 font-medium">
-                  <WorkspaceAvatar
-                    name={workspace.name}
-                    image={workspace.imageUrl}
-                  />
-                  <span className="truncate">{workspace.name}</span>
-                </div>
-              </SelectItem>
-            ))}
+            {workspaces &&
+              workspaces.documents.map((workspace) => (
+                <SelectItem
+                  key={workspace.$id}
+                  value={workspace.$id}
+                  className="cursor-pointer"
+                >
+                  <div className="flex justify-start items-center gap-3 font-medium">
+                    <WorkspaceAvatar
+                      name={workspace.name}
+                      image={workspace.imageUrl}
+                    />
+                    <span className="truncate">{workspace.name}</span>
+                  </div>
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
       </div>
@@ -114,26 +115,36 @@ export const Sidebar = () => {
             onClick={openCreateProject}
           />
         </div>
-        {projects?.documents.map((project) => {
-          const href = `/workspaces/${params.workspaceId}/projects/${project.$id}`;
-
-          return (
-            <Link href={href} key={project.$id}>
+        {!projects
+          ? Array.from({ length: 3 }).map((_, index) => (
               <div
-                className={cn(
-                  "flex items-center gap-2.5 p-2.5 rounded-md hover:opacity-75 transition cursor-pointer text-neutral-500",
-                  {
-                    "bg-white shadow-sm hover:opacity-100 text-primary":
-                      pathname === href,
-                  }
-                )}
-              >
-                <ProjectAvatar name={project.name} image={project.imageUrl} />
-                <span className="truncate">{project.name}</span>
-              </div>
-            </Link>
-          );
-        })}
+                key={index}
+                className="w-full h-[44px] rounded-md bg-white animate-pulse"
+              />
+            ))
+          : projects.documents.map((project) => {
+              const href = `/workspaces/${params.workspaceId}/projects/${project.$id}`;
+
+              return (
+                <Link href={href} key={project.$id}>
+                  <div
+                    className={cn(
+                      "flex items-center gap-2.5 p-2.5 rounded-md hover:opacity-75 transition cursor-pointer text-neutral-500",
+                      {
+                        "bg-white shadow-sm hover:opacity-100 text-primary":
+                          pathname === href,
+                      }
+                    )}
+                  >
+                    <ProjectAvatar
+                      name={project.name}
+                      image={project.imageUrl}
+                    />
+                    <span className="truncate">{project.name}</span>
+                  </div>
+                </Link>
+              );
+            })}
       </div>
     </aside>
   );

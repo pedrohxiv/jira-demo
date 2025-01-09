@@ -18,7 +18,7 @@ export const UserButton = () => {
   const { mutate } = signOut();
 
   if (!data) {
-    return null;
+    return <div className="size-10 rounded-full bg-muted animate-pulse" />;
   }
 
   return (
