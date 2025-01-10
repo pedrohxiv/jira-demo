@@ -23,6 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { signUpWithGoogle } from "@/lib/oauth";
 import { signUp } from "@/mutations/sign-up";
 import { signUpSchema } from "@/schemas/auth";
 
@@ -135,6 +136,7 @@ export const SignUpForm = () => {
       <DottedSeparator className="px-7" />
       <CardContent className="p-7 flex flex-col gap-y-4">
         <Button
+          onClick={() => signUpWithGoogle()}
           disabled={isPending}
           variant="secondary"
           size="lg"

@@ -20,23 +20,28 @@ import { getTasks } from "@/queries/get-tasks";
 
 interface Props {
   workspaceId: string;
+  projectId?: string;
   hideProjectFilter?: boolean;
 }
 
-export const TaskViewSwitcher = ({ workspaceId, hideProjectFilter }: Props) => {
+export const TaskViewSwitcher = ({
+  workspaceId,
+  projectId,
+  hideProjectFilter,
+}: Props) => {
   const { open } = useCreateTask();
   const { view, setView } = useTaskView();
-  const { projectId, assigneeId, status, dueDate, search } = useTaskFilters();
+  const filters = useTaskFilters();
 
   const { data } = getTasks({
     workspaceId,
-    projectId,
-    assigneeId,
-    status,
-    dueDate,
-    search,
+    projectId: projectId || filters.projectId,
+    assigneeId: filters.assigneeId,
+    status: filters.status,
+    dueDate: filters.dueDate,
+    search: filters.search,
   });
-  const { mutate, isPending } = bulkUpdateTasks();
+  const { mutate } = bulkUpdateTasks();
 
   const handleKanbanChange = useCallback(
     (tasks: { $id: string; status: TaskStatus; position: number }[]) => {

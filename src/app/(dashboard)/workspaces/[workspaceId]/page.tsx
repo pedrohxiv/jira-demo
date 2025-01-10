@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { auth } from "@/actions/auth";
+import { getWorkspace } from "@/actions/workspaces";
 import { Analytics } from "@/components/analytics";
 
 import { MemberList } from "./_components/member-list";
@@ -16,6 +17,12 @@ const WorkspacePage = async ({ params }: Props) => {
 
   if (!user) {
     return redirect("/sign-in");
+  }
+
+  const workspace = await getWorkspace({ workspaceId: params.workspaceId });
+
+  if (!workspace) {
+    return redirect("/");
   }
 
   return (

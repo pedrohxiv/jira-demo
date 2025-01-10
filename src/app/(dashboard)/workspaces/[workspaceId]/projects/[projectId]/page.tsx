@@ -47,7 +47,11 @@ const ProjectPage = async ({ params }: Props) => {
         </Button>
       </div>
       <Analytics projectId={params.projectId} />
-      <TaskViewSwitcher workspaceId={params.workspaceId} hideProjectFilter />
+      <TaskViewSwitcher
+        workspaceId={params.workspaceId}
+        projectId={params.projectId}
+        hideProjectFilter
+      />
     </div>
   );
 };
